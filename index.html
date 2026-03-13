@@ -1,207 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>a + b = c Calculator</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>Python Calculator</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    min-height: 100vh;
-    background: #0f1117;
-    color: #e0e8ff;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    display: flex; flex-direction: column; align-items: center;
-    padding: 40px 16px 60px;
-  }
-  h1 {
-    font-size: 2rem; font-weight: 700; letter-spacing: 2px;
-    background: linear-gradient(90deg, #00c6ff, #7b2fff);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 6px;
-  }
-  .subtitle { color: #4a6fa5; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 36px; }
-  .card {
-    background: #161b2e; border: 1px solid #1e2d4a; border-radius: 14px;
-    padding: 28px; width: 100%; max-width: 580px; margin-bottom: 20px;
-    box-shadow: 0 4px 30px #00000060;
-  }
-  .section-title { color: #4a6fa5; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;background:#0f1117;color:#e0e8ff;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:40px 16px 60px}
+  h1{font-size:1.9rem;font-weight:700;letter-spacing:2px;background:linear-gradient(90deg,#00c6ff,#7b2fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+  .subtitle{color:#4a6fa5;font-size:0.8rem;letter-spacing:2px;margin-bottom:30px}
+  .card{background:#161b2e;border:1px solid #1e2d4a;border-radius:14px;padding:24px;width:100%;max-width:620px;margin-bottom:18px;box-shadow:0 4px 30px #00000060}
 
-  /* Tabs */
-  .tabs { display: flex; gap: 0; margin-bottom: 20px; border-radius: 10px; overflow: hidden; border: 1px solid #1e2d4a; }
-  .tab {
-    flex: 1; padding: 10px; text-align: center; cursor: pointer;
-    font-size: 0.8rem; letter-spacing: 1px; font-weight: 600;
-    background: #0f1117; color: #4a6fa5; border: none; transition: all 0.2s;
-  }
-  .tab.active { background: #161b2e; color: #00c6ff; border-bottom: 2px solid #00c6ff; }
+  /* Status bar */
+  #statusBar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;background:#0f1117;border:1px solid #1e2d4a;font-size:0.78rem;font-family:monospace;color:#4a6fa5;margin-bottom:18px;width:100%;max-width:620px}
+  #statusDot{width:8px;height:8px;border-radius:50%;background:#ffb300;flex-shrink:0;box-shadow:0 0 6px #ffb300}
+  #statusDot.ready{background:#00ff9f;box-shadow:0 0 6px #00ff9f}
+  #statusDot.error{background:#ff4d6d;box-shadow:0 0 6px #ff4d6d}
 
-  /* Manual input */
-  .input-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-  .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 80px; }
-  label { font-size: 0.75rem; color: #00c6ff; letter-spacing: 1px; text-transform: uppercase; }
-  input[type="number"] {
-    background: #0f1117; border: 1px solid #1e2d4a; border-radius: 8px;
-    color: #e0e8ff; font-size: 1.1rem; padding: 10px 14px; outline: none;
-    transition: border-color 0.2s; width: 100%;
-  }
-  input[type="number"]:focus { border-color: #00c6ff; }
-  .eq { font-size: 1.4rem; color: #4a6fa5; align-self: center; padding-bottom: 4px; }
-  .result-box { display: flex; flex-direction: column; gap: 6px; min-width: 80px; }
-  .result-label { font-size: 0.75rem; color: #7b2fff; letter-spacing: 1px; text-transform: uppercase; }
-  .result-value {
-    background: #0f1117; border: 1px solid #7b2fff40; border-radius: 8px;
-    color: #bf8fff; font-size: 1.1rem; padding: 10px 14px; font-weight: 600;
-  }
+  /* Python code box */
+  .code-label{font-size:0.7rem;color:#4a6fa5;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+  .code-box{background:#0a0d18;border:1px solid #1e2d4a;border-radius:10px;padding:16px;font-family:'Courier New',monospace;font-size:0.85rem;color:#c0d8ff;line-height:1.7;white-space:pre;overflow-x:auto}
+  .code-hl{color:#bf8fff}
+  .code-eq{color:#00ff9f;font-weight:600}
 
-  /* CSV Upload */
-  .upload-zone {
-    border: 2px dashed #1e2d4a; border-radius: 12px; padding: 36px 20px;
-    text-align: center; cursor: pointer; transition: all 0.2s;
-  }
-  .upload-zone:hover, .upload-zone.drag { border-color: #00c6ff; background: #00c6ff08; }
-  .upload-icon { font-size: 2.2rem; margin-bottom: 10px; }
-  .upload-text { color: #00c6ff; font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 4px; }
-  .upload-sub { color: #4a6fa5; font-size: 0.75rem; }
-  .upload-hint {
-    margin-top: 14px; background: #0f1117; border: 1px solid #1e2d4a;
-    border-radius: 8px; padding: 10px 14px; font-size: 0.75rem; color: #4a6fa5;
-    font-family: monospace; text-align: left;
-  }
-  .upload-hint span { color: #00c6ff; }
-  .file-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: #00c6ff15; border: 1px solid #00c6ff40;
-    border-radius: 20px; padding: 6px 14px; font-size: 0.8rem;
-    color: #00c6ff; margin-top: 10px;
-  }
-  .file-badge button {
-    background: none; border: none; color: #ff4d6d; cursor: pointer;
-    font-size: 0.9rem; padding: 0; line-height: 1;
-  }
+  /* Upload */
+  .upload-zone{border:2px dashed #1e2d4a;border-radius:12px;padding:30px 20px;text-align:center;cursor:pointer;transition:all 0.2s}
+  .upload-zone:hover,.upload-zone.drag{border-color:#00c6ff;background:#00c6ff08}
+  .upload-text{color:#00c6ff;font-size:0.9rem;letter-spacing:1px;margin-bottom:4px}
+  .upload-sub{color:#4a6fa5;font-size:0.75rem}
+  .hint-box{margin-top:14px;background:#0a0d18;border:1px solid #1e2d4a;border-radius:8px;padding:10px 14px;font-size:0.75rem;color:#4a6fa5;font-family:monospace;text-align:left}
+  .hint-box span{color:#00c6ff}
+  .file-badge{display:inline-flex;align-items:center;gap:8px;background:#00c6ff15;border:1px solid #00c6ff40;border-radius:20px;padding:6px 14px;font-size:0.8rem;color:#00c6ff;margin-top:12px}
+  .file-badge button{background:none;border:none;color:#ff4d6d;cursor:pointer;font-size:1rem;padding:0;line-height:1}
 
   /* Buttons */
-  .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-  button { border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; padding: 10px 20px; transition: opacity 0.15s, transform 0.1s; }
-  button:active { transform: scale(0.97); }
-  button:disabled { opacity: 0.35; cursor: default; }
-  .btn-calc { background: linear-gradient(90deg, #00c6ff, #0072ff); color: #fff; flex: 1; }
-  .btn-upload-run { background: linear-gradient(90deg, #7b2fff, #0072ff); color: #fff; flex: 1; }
-  .btn-data { background: #1e2d4a; color: #00c6ff; border: 1px solid #00c6ff40; flex: 1; }
-  .btn-data.active { background: #00c6ff20; border-color: #00c6ff; }
-  .btn-graph { background: #1e2d4a; color: #bf8fff; border: 1px solid #7b2fff40; flex: 1; }
-  .btn-graph.active { background: #7b2fff20; border-color: #7b2fff; }
-  .btn-clear { background: transparent; border: 1px solid #ff4d6d40; color: #ff4d6d; }
-  .btn-dl { background: transparent; border: 1px solid #00ff9f40; color: #00ff9f; }
+  .btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  button{border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:700;letter-spacing:1px;padding:10px 18px;transition:all 0.15s}
+  button:active{transform:scale(0.97)}
+  button:disabled{opacity:0.3;cursor:not-allowed}
+  .btn-run{background:linear-gradient(90deg,#7b2fff,#00c6ff);color:#fff;flex:1}
+  .btn-data{background:#1e2d4a;color:#00c6ff;border:1px solid #00c6ff40;flex:1}
+  .btn-data.active{background:#00c6ff20;border-color:#00c6ff}
+  .btn-graph{background:#1e2d4a;color:#bf8fff;border:1px solid #7b2fff40;flex:1}
+  .btn-graph.active{background:#7b2fff20;border-color:#7b2fff}
+  .btn-dl-csv{background:transparent;border:1px solid #00ff9f50;color:#00ff9f;font-size:0.78rem}
+  .btn-dl-png{background:transparent;border:1px solid #ffb30050;color:#ffb300;font-size:0.78rem}
+
+  /* Alert / success */
+  .alert{background:#ff4d6d15;border:1px solid #ff4d6d40;border-radius:8px;color:#ff8fa3;font-size:0.8rem;padding:10px 14px;margin-top:12px;display:none}
+  .success{background:#00ff9f15;border:1px solid #00ff9f40;border-radius:8px;color:#00ff9f;font-size:0.8rem;padding:10px 14px;margin-top:12px;display:none}
 
   /* Panels */
-  .panel { width: 100%; max-width: 580px; display: none; }
-  .panel.visible { display: block; }
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-  thead tr { background: #0f1117; }
-  th { padding: 10px 16px; color: #00c6ff; font-size: 0.75rem; letter-spacing: 1px; text-align: right; border-bottom: 1px solid #1e2d4a; }
-  th:first-child { text-align: center; }
-  td { padding: 9px 16px; color: #c0d8ff; text-align: right; border-bottom: 1px solid #0f1117; font-family: monospace; }
-  td:first-child { text-align: center; color: #4a6fa5; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #ffffff06; }
-  .empty { color: #4a6fa5; text-align: center; padding: 24px; font-size: 0.85rem; letter-spacing: 1px; }
-  .chart-card { background: #161b2e; border: 1px solid #1e2d4a; border-radius: 14px; padding: 20px; box-shadow: 0 4px 30px #00000060; }
-  .count-badge { display: inline-block; background: #00c6ff20; border: 1px solid #00c6ff40; border-radius: 20px; color: #00c6ff; font-size: 0.72rem; letter-spacing: 1px; padding: 2px 10px; margin-left: 8px; }
-  .alert { background: #ff4d6d15; border: 1px solid #ff4d6d40; border-radius: 8px; color: #ff8fa3; font-size: 0.8rem; padding: 10px 14px; margin-top: 12px; display: none; }
-  .success { background: #00ff9f15; border: 1px solid #00ff9f40; border-radius: 8px; color: #00ff9f; font-size: 0.8rem; padding: 10px 14px; margin-top: 12px; display: none; }
+  .panel{width:100%;max-width:620px;display:none}
+  .panel.visible{display:block}
+  .panel-header{padding:12px 18px;border-bottom:1px solid #1e2d4a;display:flex;align-items:center;justify-content:space-between}
+  .panel-title{color:#00c6ff;font-size:0.78rem;letter-spacing:2px}
+  .count-badge{background:#00c6ff20;border:1px solid #00c6ff40;border-radius:20px;color:#00c6ff;font-size:0.7rem;padding:2px 10px}
+  .table-wrap{overflow-x:auto;max-height:340px;overflow-y:auto}
+  table{width:100%;border-collapse:collapse;font-size:0.88rem}
+  th{padding:10px 16px;color:#00c6ff;font-size:0.72rem;letter-spacing:1px;text-align:right;border-bottom:1px solid #1e2d4a;position:sticky;top:0;background:#0f1117}
+  th:first-child{text-align:center}
+  td{padding:8px 16px;color:#c0d8ff;text-align:right;border-bottom:1px solid #0f1117;font-family:monospace;font-size:0.82rem}
+  td:first-child{text-align:center;color:#4a6fa5}
+  td.c-val{color:#bf8fff;font-weight:600}
+  tr:hover td{background:#ffffff05}
+
+  /* Graph panel */
+  #plotImg{width:100%;border-radius:10px;display:none}
+  .graph-placeholder{color:#4a6fa5;font-size:0.85rem;text-align:center;padding:40px;letter-spacing:1px}
+
+  /* Spinner */
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid #7b2fff40;border-top-color:#7b2fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<h1>a + b = c</h1>
-<p class="subtitle">CALCULATOR &amp; VISUALIZER</p>
+<h1>Python Calculator</h1>
+<p class="subtitle">NUMPY · MATPLOTLIB · PYODIDE</p>
 
+<!-- Status -->
+<div id="statusBar">
+  <div id="statusDot"></div>
+  <span id="statusMsg">Loading Python environment (Pyodide + NumPy + Matplotlib)…</span>
+</div>
+
+<!-- Python code preview -->
 <div class="card">
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('manual')">✏️ Manual Input</button>
-    <button class="tab" onclick="switchTab('csv')">📂 Upload CSV</button>
+  <div class="code-label">🐍 Python code running in background</div>
+  <div class="code-box"><span class="code-hl">import</span> numpy <span class="code-hl">as</span> np
+<span class="code-hl">import</span> matplotlib.pyplot <span class="code-hl">as</span> plt
+
+a = np.array(<span class="code-hl">[ your uploaded a values ]</span>)
+b = np.array(<span class="code-hl">[ your uploaded b values ]</span>)
+
+<span class="code-eq">c = a*b + b**2 + np.exp(a)</span>
+
+plt.plot(c)
+plt.savefig(<span class="code-hl">"plt_plot_c.png"</span>)</div>
+</div>
+
+<!-- Upload card -->
+<div class="card">
+  <div class="upload-zone" id="dropZone" onclick="document.getElementById('csvFile').click()"
+    ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+    <div style="font-size:2rem;margin-bottom:8px">📂</div>
+    <div class="upload-text">DROP CSV FILE HERE</div>
+    <div class="upload-sub">or click to browse</div>
+    <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFile(this.files[0])"/>
+  </div>
+  <div class="hint-box">
+    <span>Required CSV format — columns must be named <b>a</b> and <b>b</b>:</span><br/><br/>
+    a,b<br/>
+    1.0,2.0<br/>
+    3.5,4.1<br/>
+    10.0,20.0
+  </div>
+  <div id="fileBadge" style="display:none">
+    <div class="file-badge"><span id="fileName"></span><button onclick="clearFile()">✕</button></div>
+  </div>
+  <div class="alert" id="alertBox"></div>
+  <div class="success" id="successBox"></div>
+
+  <div class="btn-row">
+    <button class="btn-run" id="btnRun" onclick="runPython()" disabled>▶ RUN PYTHON</button>
   </div>
 
-  <!-- Manual Tab -->
-  <div id="tabManual">
-    <div class="input-row">
-      <div class="input-group">
-        <label for="valA">a</label>
-        <input type="number" id="valA" placeholder="0" step="any" />
-      </div>
-      <span class="eq">+</span>
-      <div class="input-group">
-        <label for="valB">b</label>
-        <input type="number" id="valB" placeholder="0" step="any" />
-      </div>
-      <span class="eq">=</span>
-      <div class="result-box">
-        <span class="result-label">c</span>
-        <div class="result-value" id="resultC">—</div>
-      </div>
-    </div>
-    <div class="btn-row">
-      <button class="btn-calc" onclick="calculate()">CALCULATE &amp; ADD</button>
-    </div>
-  </div>
-
-  <!-- CSV Tab -->
-  <div id="tabCSV" style="display:none;">
-    <div class="upload-zone" id="dropZone" onclick="document.getElementById('csvFile').click()"
-      ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
-      <div class="upload-icon">📂</div>
-      <div class="upload-text">DROP YOUR CSV HERE</div>
-      <div class="upload-sub">or click to browse</div>
-      <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFile(this.files[0])"/>
-    </div>
-    <div class="upload-hint">
-      <span>Required CSV format:</span><br/>
-      a,b<br/>
-      1,2<br/>
-      3,4<br/>
-      10,20<br/>
-      <span>→ Column headers must be exactly <b>a</b> and <b>b</b></span>
-    </div>
-    <div id="fileBadge" style="display:none;">
-      <div class="file-badge">
-        <span id="fileName">file.csv</span>
-        <button onclick="clearFile()">✕</button>
-      </div>
-    </div>
-    <div class="alert" id="alertBox"></div>
-    <div class="success" id="successBox"></div>
-    <div class="btn-row">
-      <button class="btn-upload-run" id="btnRun" onclick="runCSV()" disabled>▶ RUN &amp; CALCULATE</button>
-    </div>
-  </div>
-
-  <!-- Shared bottom buttons -->
-  <div class="btn-row" style="margin-top:16px; padding-top:16px; border-top:1px solid #1e2d4a;">
+  <div class="btn-row" style="padding-top:14px;border-top:1px solid #1e2d4a;margin-top:14px">
     <button class="btn-data" id="btnData" onclick="togglePanel('data')">📋 SHOW DATA</button>
     <button class="btn-graph" id="btnGraph" onclick="togglePanel('graph')">📈 SHOW GRAPH</button>
-    <button class="btn-dl" onclick="downloadCSV()">⬇ CSV</button>
-    <button class="btn-clear" onclick="clearAll()">✕</button>
   </div>
 </div>
 
 <!-- Data Panel -->
 <div class="panel" id="panelData">
-  <div class="card" style="padding:0;overflow:hidden;">
-    <div style="padding:14px 18px 10px;border-bottom:1px solid #1e2d4a;display:flex;align-items:center;">
-      <span style="color:#00c6ff;font-size:0.8rem;letter-spacing:1px;">DATA TABLE</span>
-      <span class="count-badge" id="rowCount">0 rows</span>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="panel-header">
+      <span class="panel-title">RESULTS TABLE</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="count-badge" id="rowCount">0 rows</span>
+        <button class="btn-dl-csv" id="btnDlCSV" onclick="downloadCSV()" disabled>⬇ Download CSV</button>
+      </div>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>a</th><th>b</th><th>c = a + b</th></tr></thead>
-        <tbody id="tableBody">
-          <tr><td colspan="4" class="empty">No data yet</td></tr>
-        </tbody>
+        <thead><tr><th>#</th><th>a</th><th>b</th><th>c = a·b + b² + eᵃ</th></tr></thead>
+        <tbody id="tableBody"><tr><td colspan="4" style="text-align:center;color:#4a6fa5;padding:24px;font-size:0.82rem;letter-spacing:1px">Run the calculation to see results</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -209,180 +154,215 @@
 
 <!-- Graph Panel -->
 <div class="panel" id="panelGraph">
-  <div class="chart-card">
-    <canvas id="myChart" height="300"></canvas>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="color:#bf8fff;font-size:0.78rem;letter-spacing:2px">plt.plot(c)</span>
+      <button class="btn-dl-png" id="btnDlPNG" onclick="downloadPNG()" disabled>⬇ Download PNG</button>
+    </div>
+    <div class="graph-placeholder" id="graphPlaceholder">Run the calculation to see graph</div>
+    <img id="plotImg" alt="plt.plot(c)"/>
   </div>
 </div>
 
 <script>
-  let entries = [];
-  let chartInst = null;
-  let activePanel = null;
-  let csvRaw = null;
+let pyodide = null;
+let entries = [];
+let plotB64 = null;
+let csvRaw = null;
+let activePanel = null;
 
-  // --- Tabs ---
-  function switchTab(t) {
-    document.getElementById('tabManual').style.display = t === 'manual' ? '' : 'none';
-    document.getElementById('tabCSV').style.display = t === 'csv' ? '' : 'none';
-    document.querySelectorAll('.tab').forEach((el, i) => el.classList.toggle('active', (i === 0) === (t === 'manual')));
+// --- Load Pyodide ---
+async function loadPyodide_() {
+  try {
+    pyodide = await loadPyodide();
+    await pyodide.loadPackage(['numpy', 'matplotlib']);
+    setStatus('ready', 'Python ready — NumPy & Matplotlib loaded');
+    document.getElementById('btnRun').disabled = !csvRaw;
+  } catch(e) {
+    setStatus('error', 'Failed to load Python: ' + e.message);
   }
+}
 
-  // --- Manual ---
-  function calculate() {
-    const a = parseFloat(document.getElementById('valA').value);
-    const b = parseFloat(document.getElementById('valB').value);
-    if (isNaN(a) || isNaN(b)) { alert('Please enter valid numbers.'); return; }
-    const c = a + b;
-    document.getElementById('resultC').textContent = +c.toFixed(6);
-    entries.push({ a, b, c });
-    refresh();
+function setStatus(state, msg) {
+  const dot = document.getElementById('statusDot');
+  dot.className = state === 'ready' ? 'ready' : state === 'error' ? 'error' : '';
+  document.getElementById('statusMsg').textContent = msg;
+}
+
+// --- File handling ---
+function onDrag(e, s) { e.preventDefault(); document.getElementById('dropZone').classList.toggle('drag', s); }
+function onDrop(e) { e.preventDefault(); onDrag(e, false); handleFile(e.dataTransfer.files[0]); }
+
+function handleFile(file) {
+  if (!file) return;
+  hideAlerts();
+  const reader = new FileReader();
+  reader.onload = ev => {
+    csvRaw = ev.target.result;
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileBadge').style.display = '';
+    if (pyodide) document.getElementById('btnRun').disabled = false;
+    showSuccess(`"${file.name}" loaded — click RUN PYTHON`);
+  };
+  reader.readAsText(file);
+}
+
+function clearFile() {
+  csvRaw = null;
+  document.getElementById('csvFile').value = '';
+  document.getElementById('fileBadge').style.display = 'none';
+  document.getElementById('btnRun').disabled = true;
+  hideAlerts();
+}
+
+// --- Run Python ---
+async function runPython() {
+  if (!pyodide || !csvRaw) return;
+  hideAlerts();
+
+  // Parse CSV
+  const lines = csvRaw.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const ai = headers.indexOf('a'), bi = headers.indexOf('b');
+  if (ai === -1 || bi === -1) { showAlert('CSV must have columns "a" and "b".'); return; }
+
+  const aVals = [], bVals = [];
+  let skipped = 0;
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',');
+    const a = parseFloat(cols[ai]), b = parseFloat(cols[bi]);
+    if (isNaN(a) || isNaN(b)) { skipped++; continue; }
+    aVals.push(a); bVals.push(b);
   }
+  if (!aVals.length) { showAlert('No valid numeric rows found.'); return; }
 
-  // --- CSV Upload ---
-  function onDrag(e, state) {
-    e.preventDefault();
-    document.getElementById('dropZone').classList.toggle('drag', state);
-  }
+  const btn = document.getElementById('btnRun');
+  btn.innerHTML = '<span class="spinner"></span>Running…';
+  btn.disabled = true;
+  setStatus('', 'Running Python…');
 
-  function onDrop(e) {
-    e.preventDefault();
-    onDrag(e, false);
-    handleFile(e.dataTransfer.files[0]);
-  }
+  try {
+    // Pass data to Python
+    pyodide.globals.set('a_list', aVals);
+    pyodide.globals.set('b_list', bVals);
 
-  function handleFile(file) {
-    if (!file) return;
-    hideAlerts();
-    const reader = new FileReader();
-    reader.onload = ev => {
-      csvRaw = ev.target.result;
-      document.getElementById('fileName').textContent = file.name;
-      document.getElementById('fileBadge').style.display = '';
-      document.getElementById('btnRun').disabled = false;
-      showSuccess(`"${file.name}" loaded — click RUN to calculate`);
-    };
-    reader.readAsText(file);
-  }
+    const code = `
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import io, base64
 
-  function clearFile() {
-    csvRaw = null;
-    document.getElementById('csvFile').value = '';
-    document.getElementById('fileBadge').style.display = 'none';
-    document.getElementById('btnRun').disabled = true;
-    hideAlerts();
-  }
+a = np.array(a_list)
+b = np.array(b_list)
+c = a*b + b**2 + np.exp(a)
 
-  function runCSV() {
-    if (!csvRaw) return;
-    hideAlerts();
-    const lines = csvRaw.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-    const ai = headers.indexOf('a'), bi = headers.indexOf('b');
-    if (ai === -1 || bi === -1) {
-      showAlert('CSV must have columns named "a" and "b" in the header row.');
-      return;
-    }
-    let added = 0, skipped = 0;
-    for (let i = 1; i < lines.length; i++) {
-      const cols = lines[i].split(',');
-      const a = parseFloat(cols[ai]), b = parseFloat(cols[bi]);
-      if (isNaN(a) || isNaN(b)) { skipped++; continue; }
-      entries.push({ a, b, c: a + b });
-      added++;
-    }
-    refresh();
-    showSuccess(`✓ ${added} rows processed${skipped ? `, ${skipped} skipped (invalid)` : ''}`);
-  }
+# Plot
+fig, ax = plt.subplots(figsize=(8, 4), facecolor='#0f1117')
+ax.set_facecolor('#0a0d18')
+ax.plot(c, color='#bf8fff', linewidth=2, marker='o', markersize=4, markerfacecolor='#00c6ff')
+ax.set_xlabel('Index', color='#4a6fa5', fontsize=10)
+ax.set_ylabel('c', color='#4a6fa5', fontsize=10)
+ax.set_title('plt.plot(c)', color='#e0e8ff', fontsize=12, pad=12)
+ax.tick_params(colors='#4a6fa5')
+for spine in ax.spines.values():
+    spine.set_edgecolor('#1e2d4a')
+ax.grid(True, color='#1e2d4a', linestyle='--', alpha=0.6)
+fig.tight_layout()
 
-  function showAlert(msg) { const el = document.getElementById('alertBox'); el.textContent = msg; el.style.display = ''; }
-  function showSuccess(msg) { const el = document.getElementById('successBox'); el.textContent = msg; el.style.display = ''; }
-  function hideAlerts() { document.getElementById('alertBox').style.display = 'none'; document.getElementById('successBox').style.display = 'none'; }
+buf = io.BytesIO()
+fig.savefig(buf, format='png', dpi=150, facecolor=fig.get_facecolor())
+buf.seek(0)
+img_b64 = base64.b64encode(buf.read()).decode()
+plt.close(fig)
 
-  // --- Shared ---
-  function refresh() {
+{'c': c.tolist(), 'img': img_b64}
+`;
+    const result = await pyodide.runPythonAsync(code);
+    const res = result.toJs({ dict_converter: Object.fromEntries });
+
+    const cVals = res.c;
+    plotB64 = res.img;
+
+    entries = aVals.map((a, i) => ({ a, b: bVals[i], c: cVals[i] }));
+
     refreshTable();
-    refreshChart();
+    refreshPlot();
+    setStatus('ready', `Done — ${entries.length} rows computed${skipped ? `, ${skipped} skipped` : ''}`);
+    showSuccess(`✓ Calculated ${entries.length} values of c`);
+
+    document.getElementById('btnDlCSV').disabled = false;
+    document.getElementById('btnDlPNG').disabled = false;
+  } catch(e) {
+    showAlert('Python error: ' + e.message);
+    setStatus('error', 'Python error');
   }
 
-  function refreshTable() {
-    const tbody = document.getElementById('tableBody');
-    document.getElementById('rowCount').textContent = entries.length + ' row' + (entries.length !== 1 ? 's' : '');
-    if (!entries.length) {
-      tbody.innerHTML = '<tr><td colspan="4" class="empty">No data yet</td></tr>';
-      return;
-    }
-    tbody.innerHTML = entries.map((e, i) =>
-      `<tr><td>${i+1}</td><td>${e.a}</td><td>${e.b}</td><td style="color:#bf8fff;font-weight:600;">${+e.c.toFixed(6)}</td></tr>`
-    ).join('');
-  }
+  btn.innerHTML = '▶ RUN PYTHON';
+  btn.disabled = false;
+}
 
-  function refreshChart() {
-    const labels = entries.map((_, i) => `#${i+1}`);
-    const ds = [
-      { label: 'a', data: entries.map(e => e.a), borderColor: '#00c6ff', backgroundColor: '#00c6ff20', tension: 0.3, pointRadius: 4, borderWidth: 2 },
-      { label: 'b', data: entries.map(e => e.b), borderColor: '#ffb300', backgroundColor: '#ffb30020', tension: 0.3, pointRadius: 4, borderWidth: 2 },
-      { label: 'c = a + b', data: entries.map(e => e.c), borderColor: '#bf8fff', backgroundColor: '#7b2fff20', tension: 0.3, pointRadius: 4, borderWidth: 2.5, fill: true }
-    ];
-    if (chartInst) {
-      chartInst.data.labels = labels;
-      chartInst.data.datasets.forEach((d, i) => d.data = ds[i].data);
-      chartInst.update(); return;
-    }
-    chartInst = new Chart(document.getElementById('myChart').getContext('2d'), {
-      type: 'line',
-      data: { labels, datasets: ds },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { labels: { color: '#c0d8ff', font: { family: 'monospace', size: 11 } } },
-          tooltip: { backgroundColor: '#161b2e', titleColor: '#00c6ff', bodyColor: '#c0d8ff', borderColor: '#1e2d4a', borderWidth: 1 }
-        },
-        scales: {
-          x: { ticks: { color: '#4a6fa5', font: { family: 'monospace', size: 10 } }, grid: { color: '#1e2d4a' } },
-          y: { ticks: { color: '#4a6fa5', font: { family: 'monospace', size: 10 } }, grid: { color: '#1e2d4a' } }
-        }
-      }
-    });
-  }
+// --- Table ---
+function refreshTable() {
+  document.getElementById('rowCount').textContent = entries.length + ' rows';
+  document.getElementById('tableBody').innerHTML = entries.map((e, i) =>
+    `<tr>
+      <td>${i+1}</td>
+      <td>${e.a}</td>
+      <td>${e.b}</td>
+      <td class="c-val">${e.c.toExponential(5)}</td>
+    </tr>`
+  ).join('');
+}
 
-  function togglePanel(which) {
-    const pD = document.getElementById('panelData'), pG = document.getElementById('panelGraph');
-    const bD = document.getElementById('btnData'), bG = document.getElementById('btnGraph');
-    if (activePanel === which) {
-      pD.classList.remove('visible'); pG.classList.remove('visible');
-      bD.classList.remove('active'); bG.classList.remove('active');
-      activePanel = null;
-    } else {
-      pD.classList.toggle('visible', which === 'data');
-      pG.classList.toggle('visible', which === 'graph');
-      bD.classList.toggle('active', which === 'data');
-      bG.classList.toggle('active', which === 'graph');
-      activePanel = which;
-    }
-  }
+// --- Plot ---
+function refreshPlot() {
+  if (!plotB64) return;
+  const img = document.getElementById('plotImg');
+  img.src = 'data:image/png;base64,' + plotB64;
+  img.style.display = 'block';
+  document.getElementById('graphPlaceholder').style.display = 'none';
+}
 
-  function clearAll() {
-    if (!entries.length) return;
-    if (!confirm('Clear all data?')) return;
-    entries = [];
-    document.getElementById('resultC').textContent = '—';
-    document.getElementById('valA').value = '';
-    document.getElementById('valB').value = '';
-    clearFile();
-    refresh();
-    if (chartInst) { chartInst.destroy(); chartInst = null; }
+// --- Toggle panels ---
+function togglePanel(which) {
+  const pD = document.getElementById('panelData'), pG = document.getElementById('panelGraph');
+  const bD = document.getElementById('btnData'), bG = document.getElementById('btnGraph');
+  if (activePanel === which) {
+    pD.classList.remove('visible'); pG.classList.remove('visible');
+    bD.classList.remove('active'); bG.classList.remove('active');
+    activePanel = null;
+  } else {
+    pD.classList.toggle('visible', which === 'data');
+    pG.classList.toggle('visible', which === 'graph');
+    bD.classList.toggle('active', which === 'data');
+    bG.classList.toggle('active', which === 'graph');
+    activePanel = which;
   }
+}
 
-  function downloadCSV() {
-    if (!entries.length) { alert('No data to download.'); return; }
-    const blob = new Blob(['a,b,c\n' + entries.map(e => `${e.a},${e.b},${e.c}`).join('\n')], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'ab_results.csv'; a.click();
-    URL.revokeObjectURL(url);
-  }
+// --- Downloads ---
+function downloadCSV() {
+  if (!entries.length) return;
+  const blob = new Blob(['a,b,c\n' + entries.map(e => `${e.a},${e.b},${e.c}`).join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'results.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
 
-  document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('tabManual').style.display !== 'none') calculate(); });
+function downloadPNG() {
+  if (!plotB64) return;
+  const a = document.createElement('a');
+  a.href = 'data:image/png;base64,' + plotB64;
+  a.download = 'plt_plot_c.png';
+  a.click();
+}
+
+function showAlert(msg) { const el=document.getElementById('alertBox'); el.textContent=msg; el.style.display=''; }
+function showSuccess(msg) { const el=document.getElementById('successBox'); el.textContent=msg; el.style.display=''; }
+function hideAlerts() { document.getElementById('alertBox').style.display='none'; document.getElementById('successBox').style.display='none'; }
+
+loadPyodide_();
 </script>
 </body>
 </html>
