@@ -9,23 +9,31 @@
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   body{min-height:100vh;background:#0f1117;color:#e0e8ff;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:40px 16px 60px}
   h1{font-size:1.9rem;font-weight:700;letter-spacing:2px;background:linear-gradient(90deg,#00c6ff,#7b2fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-  .subtitle{color:#4a6fa5;font-size:0.8rem;letter-spacing:2px;margin-bottom:30px}
-  .card{background:#161b2e;border:1px solid #1e2d4a;border-radius:14px;padding:24px;width:100%;max-width:620px;margin-bottom:18px;box-shadow:0 4px 30px #00000060}
+  .subtitle{color:#4a6fa5;font-size:0.8rem;letter-spacing:2px;margin-bottom:28px}
+  .card{background:#161b2e;border:1px solid #1e2d4a;border-radius:14px;padding:24px;width:100%;max-width:640px;margin-bottom:18px;box-shadow:0 4px 30px #00000060}
 
-  /* Status bar */
-  #statusBar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;background:#0f1117;border:1px solid #1e2d4a;font-size:0.78rem;font-family:monospace;color:#4a6fa5;margin-bottom:18px;width:100%;max-width:620px}
+  /* Status */
+  #statusBar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;background:#0f1117;border:1px solid #1e2d4a;font-size:0.78rem;font-family:monospace;color:#4a6fa5;margin-bottom:18px;width:100%;max-width:640px}
   #statusDot{width:8px;height:8px;border-radius:50%;background:#ffb300;flex-shrink:0;box-shadow:0 0 6px #ffb300}
   #statusDot.ready{background:#00ff9f;box-shadow:0 0 6px #00ff9f}
   #statusDot.error{background:#ff4d6d;box-shadow:0 0 6px #ff4d6d}
 
-  /* Python code box */
-  .code-label{font-size:0.7rem;color:#4a6fa5;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
-  .code-box{background:#0a0d18;border:1px solid #1e2d4a;border-radius:10px;padding:16px;font-family:'Courier New',monospace;font-size:0.85rem;color:#c0d8ff;line-height:1.7;white-space:pre;overflow-x:auto}
-  .code-hl{color:#bf8fff}
-  .code-eq{color:#00ff9f;font-weight:600}
+  /* Tabs */
+  .tabs{display:flex;border-radius:10px;overflow:hidden;border:1px solid #1e2d4a;margin-bottom:22px}
+  .tab{flex:1;padding:11px;text-align:center;cursor:pointer;font-size:0.82rem;letter-spacing:1px;font-weight:700;background:#0f1117;color:#4a6fa5;border:none;transition:all 0.2s}
+  .tab.active{background:#161b2e;color:#00c6ff;border-bottom:2px solid #00c6ff}
+
+  /* Manual input */
+  .section-label{font-size:0.7rem;color:#4a6fa5;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+  .input-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px}
+  .input-group{display:flex;flex-direction:column;gap:6px;flex:1;min-width:100px}
+  label{font-size:0.75rem;color:#00c6ff;letter-spacing:1px;text-transform:uppercase}
+  input[type="number"],input[type="text"]{background:#0a0d18;border:1px solid #1e2d4a;border-radius:8px;color:#e0e8ff;font-size:1rem;padding:10px 14px;outline:none;transition:border-color 0.2s;width:100%;font-family:monospace}
+  input:focus{border-color:#00c6ff}
+  .multi-hint{font-size:0.72rem;color:#4a6fa5;margin-top:4px}
 
   /* Upload */
-  .upload-zone{border:2px dashed #1e2d4a;border-radius:12px;padding:30px 20px;text-align:center;cursor:pointer;transition:all 0.2s}
+  .upload-zone{border:2px dashed #1e2d4a;border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s}
   .upload-zone:hover,.upload-zone.drag{border-color:#00c6ff;background:#00c6ff08}
   .upload-text{color:#00c6ff;font-size:0.9rem;letter-spacing:1px;margin-bottom:4px}
   .upload-sub{color:#4a6fa5;font-size:0.75rem}
@@ -46,13 +54,14 @@
   .btn-graph.active{background:#7b2fff20;border-color:#7b2fff}
   .btn-dl-csv{background:transparent;border:1px solid #00ff9f50;color:#00ff9f;font-size:0.78rem}
   .btn-dl-png{background:transparent;border:1px solid #ffb30050;color:#ffb300;font-size:0.78rem}
+  .btn-clear{background:transparent;border:1px solid #ff4d6d40;color:#ff4d6d;font-size:0.78rem}
 
   /* Alert / success */
   .alert{background:#ff4d6d15;border:1px solid #ff4d6d40;border-radius:8px;color:#ff8fa3;font-size:0.8rem;padding:10px 14px;margin-top:12px;display:none}
   .success{background:#00ff9f15;border:1px solid #00ff9f40;border-radius:8px;color:#00ff9f;font-size:0.8rem;padding:10px 14px;margin-top:12px;display:none}
 
   /* Panels */
-  .panel{width:100%;max-width:620px;display:none}
+  .panel{width:100%;max-width:640px;display:none}
   .panel.visible{display:block}
   .panel-header{padding:12px 18px;border-bottom:1px solid #1e2d4a;display:flex;align-items:center;justify-content:space-between}
   .panel-title{color:#00c6ff;font-size:0.78rem;letter-spacing:2px}
@@ -65,12 +74,9 @@
   td:first-child{text-align:center;color:#4a6fa5}
   td.c-val{color:#bf8fff;font-weight:600}
   tr:hover td{background:#ffffff05}
-
-  /* Graph panel */
+  .chart-card{background:#161b2e;border:1px solid #1e2d4a;border-radius:14px;padding:20px;box-shadow:0 4px 30px #00000060}
   #plotImg{width:100%;border-radius:10px;display:none}
   .graph-placeholder{color:#4a6fa5;font-size:0.85rem;text-align:center;padding:40px;letter-spacing:1px}
-
-  /* Spinner */
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid #7b2fff40;border-top-color:#7b2fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
   @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -78,56 +84,69 @@
 <body>
 
 <h1>Python Calculator</h1>
-<p class="subtitle">NUMPY · MATPLOTLIB · PYODIDE</p>
+<p class="subtitle">c = a·b + b² + eᵃ</p>
 
-<!-- Status -->
 <div id="statusBar">
   <div id="statusDot"></div>
-  <span id="statusMsg">Loading Python environment (Pyodide + NumPy + Matplotlib)…</span>
+  <span id="statusMsg">Loading Python environment…</span>
 </div>
 
-<!-- Python code preview -->
 <div class="card">
-  <div class="code-label">🐍 Python code running in background</div>
-  <div class="code-box"><span class="code-hl">import</span> numpy <span class="code-hl">as</span> np
-<span class="code-hl">import</span> matplotlib.pyplot <span class="code-hl">as</span> plt
-
-a = np.array(<span class="code-hl">[ your uploaded a values ]</span>)
-b = np.array(<span class="code-hl">[ your uploaded b values ]</span>)
-
-<span class="code-eq">c = a*b + b**2 + np.exp(a)</span>
-
-plt.plot(c)
-plt.savefig(<span class="code-hl">"plt_plot_c.png"</span>)</div>
-</div>
-
-<!-- Upload card -->
-<div class="card">
-  <div class="upload-zone" id="dropZone" onclick="document.getElementById('csvFile').click()"
-    ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
-    <div style="font-size:2rem;margin-bottom:8px">📂</div>
-    <div class="upload-text">DROP CSV FILE HERE</div>
-    <div class="upload-sub">or click to browse</div>
-    <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFile(this.files[0])"/>
-  </div>
-  <div class="hint-box">
-    <span>Required CSV format — columns must be named <b>a</b> and <b>b</b>:</span><br/><br/>
-    a,b<br/>
-    1.0,2.0<br/>
-    3.5,4.1<br/>
-    10.0,20.0
-  </div>
-  <div id="fileBadge" style="display:none">
-    <div class="file-badge"><span id="fileName"></span><button onclick="clearFile()">✕</button></div>
-  </div>
-  <div class="alert" id="alertBox"></div>
-  <div class="success" id="successBox"></div>
-
-  <div class="btn-row">
-    <button class="btn-run" id="btnRun" onclick="runPython()" disabled>▶ RUN PYTHON</button>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('manual')">✏️ Manual Input</button>
+    <button class="tab" onclick="switchTab('csv')">📂 Upload CSV</button>
   </div>
 
-  <div class="btn-row" style="padding-top:14px;border-top:1px solid #1e2d4a;margin-top:14px">
+  <!-- ── MANUAL TAB ── -->
+  <div id="tabManual">
+    <div class="section-label">Enter values for a and b</div>
+    <div class="input-row">
+      <div class="input-group">
+        <label>a values</label>
+        <input type="text" id="manualA" placeholder="e.g. 1, 2, 3, 4.5"/>
+        <div class="multi-hint">Separate multiple values with commas</div>
+      </div>
+      <div class="input-group">
+        <label>b values</label>
+        <input type="text" id="manualB" placeholder="e.g. 2, 3, 4, 5.5"/>
+        <div class="multi-hint">Must have same count as a</div>
+      </div>
+    </div>
+    <div class="alert" id="alertManual"></div>
+    <div class="success" id="successManual"></div>
+    <div class="btn-row">
+      <button class="btn-run" id="btnRunManual" onclick="runManual()" disabled>▶ RUN PYTHON</button>
+      <button class="btn-clear" onclick="clearManual()">✕ Clear</button>
+    </div>
+  </div>
+
+  <!-- ── CSV TAB ── -->
+  <div id="tabCSV" style="display:none">
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('csvFile').click()"
+      ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+      <div style="font-size:2rem;margin-bottom:8px">📂</div>
+      <div class="upload-text">DROP CSV FILE HERE</div>
+      <div class="upload-sub">or click to browse</div>
+      <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFile(this.files[0])"/>
+    </div>
+    <div class="hint-box">
+      <span>Required CSV format:</span><br/><br/>
+      a,b<br/>1.0,2.0<br/>3.5,4.1<br/>10.0,20.0<br/><br/>
+      <span>→ Column headers must be exactly <b>a</b> and <b>b</b></span>
+    </div>
+    <div id="fileBadge" style="display:none">
+      <div class="file-badge"><span id="fileName"></span><button onclick="clearFile()">✕</button></div>
+    </div>
+    <div class="alert" id="alertCSV"></div>
+    <div class="success" id="successCSV"></div>
+    <div class="btn-row">
+      <button class="btn-run" id="btnRunCSV" onclick="runCSV()" disabled>▶ RUN PYTHON</button>
+    </div>
+  </div>
+
+  <!-- Shared output buttons -->
+  <div class="btn-row" style="padding-top:16px;border-top:1px solid #1e2d4a;margin-top:18px">
     <button class="btn-data" id="btnData" onclick="togglePanel('data')">📋 SHOW DATA</button>
     <button class="btn-graph" id="btnGraph" onclick="togglePanel('graph')">📈 SHOW GRAPH</button>
   </div>
@@ -146,7 +165,9 @@ plt.savefig(<span class="code-hl">"plt_plot_c.png"</span>)</div>
     <div class="table-wrap">
       <table>
         <thead><tr><th>#</th><th>a</th><th>b</th><th>c = a·b + b² + eᵃ</th></tr></thead>
-        <tbody id="tableBody"><tr><td colspan="4" style="text-align:center;color:#4a6fa5;padding:24px;font-size:0.82rem;letter-spacing:1px">Run the calculation to see results</td></tr></tbody>
+        <tbody id="tableBody">
+          <tr><td colspan="4" style="text-align:center;color:#4a6fa5;padding:24px;font-size:0.82rem;letter-spacing:1px">Run the calculation to see results</td></tr>
+        </tbody>
       </table>
     </div>
   </div>
@@ -154,7 +175,7 @@ plt.savefig(<span class="code-hl">"plt_plot_c.png"</span>)</div>
 
 <!-- Graph Panel -->
 <div class="panel" id="panelGraph">
-  <div class="card">
+  <div class="chart-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
       <span style="color:#bf8fff;font-size:0.78rem;letter-spacing:2px">plt.plot(c)</span>
       <button class="btn-dl-png" id="btnDlPNG" onclick="downloadPNG()" disabled>⬇ Download PNG</button>
@@ -170,14 +191,15 @@ let entries = [];
 let plotB64 = null;
 let csvRaw = null;
 let activePanel = null;
+let currentTab = 'manual';
 
-// --- Load Pyodide ---
 async function loadPyodide_() {
   try {
     pyodide = await loadPyodide();
     await pyodide.loadPackage(['numpy', 'matplotlib']);
     setStatus('ready', 'Python ready — NumPy & Matplotlib loaded');
-    document.getElementById('btnRun').disabled = !csvRaw;
+    document.getElementById('btnRunManual').disabled = false;
+    if (csvRaw) document.getElementById('btnRunCSV').disabled = false;
   } catch(e) {
     setStatus('error', 'Failed to load Python: ' + e.message);
   }
@@ -185,11 +207,42 @@ async function loadPyodide_() {
 
 function setStatus(state, msg) {
   const dot = document.getElementById('statusDot');
-  dot.className = state === 'ready' ? 'ready' : state === 'error' ? 'error' : '';
+  dot.className = state;
   document.getElementById('statusMsg').textContent = msg;
 }
 
-// --- File handling ---
+// ── Tabs ──
+function switchTab(t) {
+  currentTab = t;
+  document.getElementById('tabManual').style.display = t === 'manual' ? '' : 'none';
+  document.getElementById('tabCSV').style.display = t === 'csv' ? '' : 'none';
+  document.querySelectorAll('.tab').forEach((el, i) =>
+    el.classList.toggle('active', (i === 0) === (t === 'manual')));
+}
+
+// ── Manual Input ──
+function runManual() {
+  hideAlerts();
+  const rawA = document.getElementById('manualA').value.trim();
+  const rawB = document.getElementById('manualB').value.trim();
+  if (!rawA || !rawB) { showAlert('alertManual', 'Please enter values for both a and b.'); return; }
+
+  const aVals = rawA.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+  const bVals = rawB.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+
+  if (!aVals.length || !bVals.length) { showAlert('alertManual', 'No valid numbers found. Use comma-separated values.'); return; }
+  if (aVals.length !== bVals.length) { showAlert('alertManual', `a has ${aVals.length} values but b has ${bVals.length}. They must match.`); return; }
+
+  compute(aVals, bVals, 'alertManual', 'successManual', 'btnRunManual');
+}
+
+function clearManual() {
+  document.getElementById('manualA').value = '';
+  document.getElementById('manualB').value = '';
+  hideAlerts();
+}
+
+// ── CSV Upload ──
 function onDrag(e, s) { e.preventDefault(); document.getElementById('dropZone').classList.toggle('drag', s); }
 function onDrop(e) { e.preventDefault(); onDrag(e, false); handleFile(e.dataTransfer.files[0]); }
 
@@ -201,8 +254,11 @@ function handleFile(file) {
     csvRaw = ev.target.result;
     document.getElementById('fileName').textContent = file.name;
     document.getElementById('fileBadge').style.display = '';
-    if (pyodide) document.getElementById('btnRun').disabled = false;
-    showSuccess(`"${file.name}" loaded — click RUN PYTHON`);
+    if (pyodide) document.getElementById('btnRunCSV').disabled = false;
+    showAlert('successCSV', `"${file.name}" loaded — click RUN PYTHON`);
+    document.getElementById('successCSV').style.background = '#00ff9f15';
+    document.getElementById('successCSV').style.borderColor = '#00ff9f40';
+    document.getElementById('successCSV').style.color = '#00ff9f';
   };
   reader.readAsText(file);
 }
@@ -211,20 +267,17 @@ function clearFile() {
   csvRaw = null;
   document.getElementById('csvFile').value = '';
   document.getElementById('fileBadge').style.display = 'none';
-  document.getElementById('btnRun').disabled = true;
+  document.getElementById('btnRunCSV').disabled = true;
   hideAlerts();
 }
 
-// --- Run Python ---
-async function runPython() {
-  if (!pyodide || !csvRaw) return;
+function runCSV() {
   hideAlerts();
-
-  // Parse CSV
+  if (!csvRaw) return;
   const lines = csvRaw.trim().split('\n');
   const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
   const ai = headers.indexOf('a'), bi = headers.indexOf('b');
-  if (ai === -1 || bi === -1) { showAlert('CSV must have columns "a" and "b".'); return; }
+  if (ai === -1 || bi === -1) { showAlert('alertCSV', 'CSV must have columns named "a" and "b".'); return; }
 
   const aVals = [], bVals = [];
   let skipped = 0;
@@ -234,15 +287,19 @@ async function runPython() {
     if (isNaN(a) || isNaN(b)) { skipped++; continue; }
     aVals.push(a); bVals.push(b);
   }
-  if (!aVals.length) { showAlert('No valid numeric rows found.'); return; }
+  if (!aVals.length) { showAlert('alertCSV', 'No valid numeric rows found.'); return; }
+  compute(aVals, bVals, 'alertCSV', 'successCSV', 'btnRunCSV', skipped);
+}
 
-  const btn = document.getElementById('btnRun');
+// ── Core Python compute ──
+async function compute(aVals, bVals, alertId, successId, btnId, skipped = 0) {
+  if (!pyodide) { showAlert(alertId, 'Python is still loading, please wait…'); return; }
+  const btn = document.getElementById(btnId);
   btn.innerHTML = '<span class="spinner"></span>Running…';
   btn.disabled = true;
   setStatus('', 'Running Python…');
 
   try {
-    // Pass data to Python
     pyodide.globals.set('a_list', aVals);
     pyodide.globals.set('b_list', bVals);
 
@@ -257,7 +314,6 @@ a = np.array(a_list)
 b = np.array(b_list)
 c = a*b + b**2 + np.exp(a)
 
-# Plot
 fig, ax = plt.subplots(figsize=(8, 4), facecolor='#0f1117')
 ax.set_facecolor('#0a0d18')
 ax.plot(c, color='#bf8fff', linewidth=2, marker='o', markersize=4, markerfacecolor='#00c6ff')
@@ -275,26 +331,28 @@ fig.savefig(buf, format='png', dpi=150, facecolor=fig.get_facecolor())
 buf.seek(0)
 img_b64 = base64.b64encode(buf.read()).decode()
 plt.close(fig)
-
 {'c': c.tolist(), 'img': img_b64}
 `;
     const result = await pyodide.runPythonAsync(code);
     const res = result.toJs({ dict_converter: Object.fromEntries });
 
-    const cVals = res.c;
+    entries = aVals.map((a, i) => ({ a, b: bVals[i], c: res.c[i] }));
     plotB64 = res.img;
-
-    entries = aVals.map((a, i) => ({ a, b: bVals[i], c: cVals[i] }));
 
     refreshTable();
     refreshPlot();
-    setStatus('ready', `Done — ${entries.length} rows computed${skipped ? `, ${skipped} skipped` : ''}`);
-    showSuccess(`✓ Calculated ${entries.length} values of c`);
-
     document.getElementById('btnDlCSV').disabled = false;
     document.getElementById('btnDlPNG').disabled = false;
+    setStatus('ready', `Done — ${entries.length} rows computed${skipped ? `, ${skipped} skipped` : ''}`);
+
+    const msg = `✓ ${entries.length} values calculated${skipped ? `, ${skipped} rows skipped` : ''}`;
+    showSuccess(successId, msg);
+
+    // Auto-open panels
+    if (activePanel === null) togglePanel('data');
+
   } catch(e) {
-    showAlert('Python error: ' + e.message);
+    showAlert(alertId, 'Python error: ' + e.message);
     setStatus('error', 'Python error');
   }
 
@@ -302,7 +360,6 @@ plt.close(fig)
   btn.disabled = false;
 }
 
-// --- Table ---
 function refreshTable() {
   document.getElementById('rowCount').textContent = entries.length + ' rows';
   document.getElementById('tableBody').innerHTML = entries.map((e, i) =>
@@ -315,7 +372,6 @@ function refreshTable() {
   ).join('');
 }
 
-// --- Plot ---
 function refreshPlot() {
   if (!plotB64) return;
   const img = document.getElementById('plotImg');
@@ -324,7 +380,6 @@ function refreshPlot() {
   document.getElementById('graphPlaceholder').style.display = 'none';
 }
 
-// --- Toggle panels ---
 function togglePanel(which) {
   const pD = document.getElementById('panelData'), pG = document.getElementById('panelGraph');
   const bD = document.getElementById('btnData'), bG = document.getElementById('btnGraph');
@@ -341,7 +396,6 @@ function togglePanel(which) {
   }
 }
 
-// --- Downloads ---
 function downloadCSV() {
   if (!entries.length) return;
   const blob = new Blob(['a,b,c\n' + entries.map(e => `${e.a},${e.b},${e.c}`).join('\n')], { type: 'text/csv' });
@@ -354,13 +408,16 @@ function downloadPNG() {
   if (!plotB64) return;
   const a = document.createElement('a');
   a.href = 'data:image/png;base64,' + plotB64;
-  a.download = 'plt_plot_c.png';
-  a.click();
+  a.download = 'plt_plot_c.png'; a.click();
 }
 
-function showAlert(msg) { const el=document.getElementById('alertBox'); el.textContent=msg; el.style.display=''; }
-function showSuccess(msg) { const el=document.getElementById('successBox'); el.textContent=msg; el.style.display=''; }
-function hideAlerts() { document.getElementById('alertBox').style.display='none'; document.getElementById('successBox').style.display='none'; }
+function showAlert(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = ''; }
+function showSuccess(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = ''; }
+function hideAlerts() {
+  ['alertManual','successManual','alertCSV','successCSV'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+}
 
 loadPyodide_();
 </script>
