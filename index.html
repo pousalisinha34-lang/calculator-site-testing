@@ -468,118 +468,184 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import io as _io, base64
+from scipy.special import kn
+import io as _io, base64, traceback
 
-def bessel_k2(x):
-    # Numerical approximation of K_2(x) valid for x > 0
-    # Uses the recurrence: K2(x) = 2/x * K1(x) + K0(x)
-    # Approximations for K0 and K1 (Abramowitz & Stegun)
-    x = np.asarray(x, dtype=float)
-    safe = np.maximum(x, 1e-10)
-    # For large x: K_n(x) ~ sqrt(pi/(2x)) * exp(-x)
-    large = np.sqrt(np.pi / (2.0 * safe)) * np.exp(-np.minimum(safe, 700.0)) * (1.0 + 15.0/(8.0*safe))
-    # For small x: K2(x) ~ 2/x^2
-    small = 2.0 / safe**2
-    return np.where(safe > 2.0, large, small)
+try:
+    # ── Constants ──────────────────────────────────────────────────────────────
+    cl   = 2.998e10
+    e_ch = 4.803e-10
+    sigT = 6.65245873e-25
+    mp   = 1.67262171e-24
+    me   = 9.109e-28
+    kB   = 1.3806e-16
+    hPl  = 6.626e-27
 
-cl=2.998e10; e_ch=4.803e-10; sigT=6.65245873e-25
-mp=1.67262171e-24; me=9.109e-28; kB=1.3806e-16; hPl=6.626e-27; M_sun=1.989e33
+    # ── Model parameters ───────────────────────────────────────────────────────
+    R_v      = float(p_R)
+    mu_i     = float(p_mi)
+    mu_e     = float(p_me)
+    Nfreq    = int(p_nfreq)
+    nu_min   = float(p_numin)
+    nu_max   = float(p_numax)
+    tau_max  = float(p_taumax)
+    f_cutoff = float(p_fcutoff)
+    N_scatt_thin  = int(p_nscattthin)
+    N_scatt_thick = int(p_nscattthick)
 
-mBH_v=float(p_mbh); mdot_v=float(p_mdot); R_v=float(p_R)
-mu_i=float(p_mi); mu_e=float(p_me); Nfreq=int(p_nfreq)
-nu_min=float(p_numin); nu_max=float(p_numax); tau_max=float(p_taumax)
-f_cut=float(p_fcutoff); Ns_thin=int(p_nscattthin); Ns_thick=int(p_nscattthick)
+    # ── Parse CSV (preserve original row order — r-major assumed) ──────────────
+    df = pd.read_csv(_io.StringIO(csv_content))
+    df.columns = [c.strip() for c in df.columns]   # strip whitespace only
 
-df=pd.read_csv(_io.StringIO(csv_content))
-r=np.sort(df['r'].unique()); h=np.sort(df['h'].unique()); phi_arr=np.sort(df['phi'].unique())
-r_res,th_res,phi_res=len(r),len(h),len(phi_arr)
-rho=df['rho'].values.reshape(r_res,th_res,phi_res)
-B_f=df['B'].values.reshape(r_res,th_res,phi_res)
-pg=df['pg'].values.reshape(r_res,th_res,phi_res)
-if 'volume_element' in df.columns:
-    vol=df['volume_element'].values.reshape(r_res,th_res,phi_res)
-else:
-    vol=(r[:,np.newaxis,np.newaxis]**2)*np.sin(h[np.newaxis,:,np.newaxis])*(r[1]-r[0])*(h[1]-h[0])*(phi_arr[1]-phi_arr[0])
+    required = ['r','h','phi','rho','B','pg']
+    missing  = [c for c in required if c not in df.columns]
+    if missing:
+        # try case-insensitive fallback
+        col_map = {c.lower(): c for c in df.columns}
+        rename  = {}
+        still   = []
+        for c in missing:
+            if c.lower() in col_map:
+                rename[col_map[c.lower()]] = c
+            else:
+                still.append(c)
+        if still:
+            raise ValueError(f"Missing columns: {still}. Found: {list(df.columns)}")
+        df = df.rename(columns=rename)
 
-Tp=(mu_i*pg*mp)/(kB*rho); Te=Tp/R_v; Theta_e=kB*Te/(me*cl**2)
-ne=rho/(mu_e*mp); nu_s=(e_ch*B_f)/(2*np.pi*me*cl); nu_c=(3.0/2.0)*nu_s*Theta_e**2
-nu_arr=np.logspace(np.log10(nu_min),np.log10(nu_max),Nfreq)
-dPdt=np.gradient(pg,h,axis=1)
-dPdz=np.abs(dPdt)/np.maximum(r[:,np.newaxis,np.newaxis],1e-30)
-L_scale=pg/np.maximum(dPdz,1e-30)
-tau=ne*sigT*L_scale
-tau_eff=np.minimum(np.maximum(tau,tau**2),tau_max)
-y_C=4.0*Theta_e*tau_eff; A_amp=1.0+4.0*Theta_e+16.0*Theta_e**2; N_scat=tau_eff
-Th_safe=np.maximum(Theta_e,1e-10); K2=np.maximum(bessel_k2(1.0/Th_safe),1e-300)
-j_syn4D=np.zeros((r_res,th_res,phi_res,Nfreq))
-j_syn_eff4D=np.zeros((r_res,th_res,phi_res,Nfreq))
-j_IC4D=np.zeros((r_res,th_res,phi_res,Nfreq))
-N_max=np.where(tau<1,float(Ns_thin),float(Ns_thick))
-N_cap=np.minimum(N_scat,N_max); N_sp=r_res*th_res*phi_res
+    # Recover 1D grids (unique preserves first-occurrence order = original order)
+    r   = df['r'].unique()
+    h   = df['h'].unique()
+    phi = df['phi'].unique()
+    r_res, th_res, phi_res = len(r), len(h), len(phi)
 
-for ifreq in range(Nfreq):
-    nu_o=nu_arr[ifreq]; X=nu_o/np.maximum(nu_c,1e-300)
-    pref=np.sqrt(2)*np.pi*(e_ch**2)*ne*nu_c/(3*cl*K2)
-    shp=(X**0.5+(2**(11.0/12.0))*(X**(1.0/6.0)))**2*np.exp(-np.minimum(X**(1.0/3.0),700.0))
-    j_syn4D[:,:,:,ifreq]=pref*shp
-    ts=j_syn4D[:,:,:,ifreq]*cl**2/(2*nu_o**2*kB*np.maximum(Te,1e-10))*L_scale
-    j_syn_eff4D[:,:,:,ifreq]=np.where(ts>1e-1,j_syn4D[:,:,:,ifreq]*(1.0-np.exp(-np.minimum(ts,700.0)))/np.maximum(ts,1e-300),j_syn4D[:,:,:,ifreq])
+    expected = r_res * th_res * phi_res
+    if len(df) != expected:
+        raise ValueError(
+            f"CSV has {len(df)} rows but grid {r_res}x{th_res}x{phi_res} needs {expected}. "
+            "Rows must be in r-major order (r varies slowest, phi fastest).")
 
-log_nu_arr=np.log10(nu_arr)
-for ifreq in range(Nfreq):
-    nu_o=nu_arr[ifreq]
-    nu_seed=nu_o/np.maximum(A_amp**N_cap,1e-300)
-    lns_flat=np.log10(np.maximum(nu_seed.ravel(),1e-300))
-    logj_flat=np.log10(j_syn_eff4D.reshape(N_sp,Nfreq)+1e-50)
-    idx=np.clip(np.searchsorted(log_nu_arr,lns_flat),1,Nfreq-1)
-    x0=log_nu_arr[idx-1]; x1=log_nu_arr[idx]
-    y0=logj_flat[np.arange(N_sp),idx-1]; y1=logj_flat[np.arange(N_sp),idx]
-    t=np.clip((lns_flat-x0)/np.maximum(x1-x0,1e-30),0.0,1.0)
-    j_seed=(10**(y0+t*(y1-y0))).reshape(r_res,th_res,phi_res)
-    xw=hPl*nu_o/(kB*np.maximum(Te,1e-10)*f_cut)
-    cfac=np.exp(-np.minimum(xw,700.0))
-    j_IC4D[:,:,:,ifreq]=y_C*j_seed*cfac
+    # Reshape directly — NO re-sorting, preserving original r-major order
+    rho = df['rho'].values.reshape(r_res, th_res, phi_res)
+    B   = df['B'].values.reshape(r_res, th_res, phi_res)
+    pg  = df['pg'].values.reshape(r_res, th_res, phi_res)
 
-L_syn_nu=np.sum(j_syn_eff4D*vol[:,:,:,np.newaxis],axis=(0,1,2))
-L_IC_nu=np.sum(j_IC4D*vol[:,:,:,np.newaxis],axis=(0,1,2))
-L_tot_nu=L_syn_nu+L_IC_nu
+    if 'volume_element' in df.columns:
+        volume_element = df['volume_element'].values.reshape(r_res, th_res, phi_res)
+    else:
+        # FIX: proper r broadcasting with r3d
+        r3d = r[:, np.newaxis, np.newaxis]
+        volume_element = (r3d**2) * np.sin(h[np.newaxis, :, np.newaxis]) * \
+                         (r[1]-r[0]) * (h[1]-h[0]) * (phi[1]-phi[0])
 
-fig,ax=plt.subplots(figsize=(9,5),facecolor='#f9fafb')
-ax.set_facecolor('#ffffff')
-ax.plot(nu_arr,nu_arr*L_syn_nu,color='#2563eb',linewidth=2.2,label='Synchrotron')
-ax.plot(nu_arr,nu_arr*L_IC_nu,color='#f97316',linewidth=2.2,label='Inverse Compton')
-ax.plot(nu_arr,nu_arr*L_tot_nu,color='#111827',linewidth=2.0,alpha=0.55,label='Total')
-ax.set_yscale('log'); ax.set_xscale('log')
-ax.set_xlim(1e10,1e22)
-yv=nu_arr*L_tot_nu; yp=yv[np.isfinite(yv)&(yv>0)]
-if len(yp): ax.set_ylim(yp.min()*0.1,yp.max()*10)
-ax.tick_params(colors='#4b5563',labelsize=11)
-for sp in ax.spines.values(): sp.set_edgecolor('#e5e7eb')
-ax.grid(True,color='#f3f4f6',linestyle='--',alpha=1.0)
-ax.set_xlabel('Frequency (Hz)',fontsize=12,color='#374151')
-ax.set_ylabel(r'$\\nu L_\\nu$ (erg/s)',fontsize=12,color='#374151')
-ax.set_title('Spectral Energy Distribution',fontsize=14,color='#111827',fontweight='bold',pad=14)
-ax.legend(fontsize=11,framealpha=0.95)
-fig.tight_layout()
-buf=_io.BytesIO()
-fig.savefig(buf,format='png',dpi=150,facecolor=fig.get_facecolor())
-buf.seek(0)
-img_b64=base64.b64encode(buf.read()).decode()
-plt.close(fig)
+    # ── Derived physical quantities ────────────────────────────────────────────
+    Tp      = (mu_i * pg * mp) / (kB * np.maximum(rho, 1e-60))
+    Te      = Tp / R_v
+    Theta_e = kB * Te / (me * cl**2)
+    ne      = rho / (mu_e * mp)
 
-rows=['Freq,L_syn,L_IC,L_tot']
-for i in range(Nfreq):
-    rows.append(f'{nu_arr[i]:.6e},{L_syn_nu[i]:.6e},{L_IC_nu[i]:.6e},{L_tot_nu[i]:.6e}')
-csv_out=chr(10).join(rows)
-{'img':img_b64,'csv':csv_out,'nfreq':Nfreq}
-`;
+    # FIX 1: cyclotron freq → nu_s (was wrongly named nu, colliding with loop var)
+    nu_s = (e_ch * B) / (2 * np.pi * me * cl)
+    nu_c = (3.0/2.0) * nu_s * Theta_e**2
+
+    nu_array = np.logspace(np.log10(nu_min), np.log10(nu_max), Nfreq)
+
+    # ── Compton parameters ─────────────────────────────────────────────────────
+    dP_dtheta = np.gradient(pg, h, axis=1)
+    # FIX 4: correct r broadcasting — divide by r3d not bare r
+    r3d   = r[:, np.newaxis, np.newaxis]
+    dP_dz = np.abs(dP_dtheta) / np.maximum(r3d, 1e-30)
+    length_scale   = pg / np.maximum(dP_dz, 1e-30)
+    tau            = ne * sigT * length_scale
+    tau_effective  = np.minimum(np.maximum(tau, tau**2), tau_max)
+    y_compton      = 4.0 * Theta_e * tau_effective
+    A_amplification= 1.0 + 4.0*Theta_e + 16.0*Theta_e**2
+    N_scatterings  = tau_effective
+
+    # FIX 2: use proper variable names (was pseudocode N_{scatt,thin})
+    N_max_array        = np.where(tau < 1, float(N_scatt_thin), float(N_scatt_thick))
+    N_scatterings_capped = np.minimum(N_scatterings, N_max_array)
+
+    # ── Bessel K2 (safe) ───────────────────────────────────────────────────────
+    Theta_e_safe  = np.maximum(Theta_e, 1e-10)
+    K2_inv_Theta  = np.maximum(kn(2, np.minimum(1.0/Theta_e_safe, 700.0)), 1e-300)
+
+    # ── Initialise output arrays ───────────────────────────────────────────────
+    j_nu_syn_4D     = np.zeros((r_res, th_res, phi_res, Nfreq))
+    j_nu_syn_eff_4D = np.zeros((r_res, th_res, phi_res, Nfreq))
+    j_nu_IC_4D      = np.zeros((r_res, th_res, phi_res, Nfreq))
+    N_sp = r_res * th_res * phi_res
+
+    # ── Synchrotron loop ───────────────────────────────────────────────────────
+    for ifreq in range(Nfreq):
+        nu = nu_array[ifreq]                          # observed frequency
+        X  = nu / np.maximum(nu_c, 1e-300)
+        prefactor     = np.sqrt(2)*np.pi*e_ch**2*ne*nu_c / (3*cl*K2_inv_Theta)
+        spectral_shape= (X**0.5 + 2.0**(11.0/12.0)*X**(1.0/6.0))**2 \
+                        * np.exp(-np.minimum(X**(1.0/3.0), 500.0))
+        j_nu_syn_4D[:,:,:,ifreq] = np.nan_to_num(prefactor*spectral_shape, nan=0, posinf=0)
+
+        tau_syn = np.clip(
+            j_nu_syn_4D[:,:,:,ifreq]*cl**2/(2*nu**2*kB*np.maximum(Te,1e-10))*length_scale,
+            0, 500)
+        j_nu_syn_eff_4D[:,:,:,ifreq] = np.where(
+            tau_syn > 1e-1,
+            j_nu_syn_4D[:,:,:,ifreq]*(1.0-np.exp(-tau_syn))/np.maximum(tau_syn,1e-300),
+            j_nu_syn_4D[:,:,:,ifreq])
+
+    # ── Inverse Compton loop ───────────────────────────────────────────────────
+    log_nu_array = np.log10(nu_array)
+
+    for ifreq in range(Nfreq):
+        nu_obs = nu_array[ifreq]
+
+        # FIX 3: A**N → exp(N·ln A) to avoid overflow
+        exp_arg = np.minimum(
+            N_scatterings_capped * np.log(np.maximum(A_amplification, 1.0+1e-10)), 500.0)
+        nu_seed = nu_obs / np.maximum(np.exp(exp_arg), 1e-300)
+
+        log_nu_seed = np.log10(np.maximum(nu_seed, 1e-300))
+        lns_flat    = log_nu_seed.ravel()
+        logj_flat   = np.log10(j_nu_syn_eff_4D.reshape(N_sp, Nfreq) + 1e-60)
+
+        idx = np.clip(np.searchsorted(log_nu_array, lns_flat), 1, Nfreq-1)
+        x0  = log_nu_array[idx-1];  x1 = log_nu_array[idx]
+        y0  = logj_flat[np.arange(N_sp), idx-1]
+        y1  = logj_flat[np.arange(N_sp), idx]
+        t   = np.clip((lns_flat-x0)/np.maximum(x1-x0,1e-30), 0.0, 1.0)
+        j_nu_seed = (10**(y0+t*(y1-y0))).reshape(r_res, th_res, phi_res)
+
+        x_wien        = np.minimum(hPl*nu_obs/(kB*np.maximum(Te,1e-10)*f_cutoff), 500.0)
+        cutoff_factor = np.exp(-x_wien)
+        j_nu_IC_4D[:,:,:,ifreq] = np.nan_to_num(
+            y_compton*j_nu_seed*cutoff_factor, nan=0, posinf=0)
+
+    # ── Integrate luminosities ─────────────────────────────────────────────────
+    L_syn_nu = np.sum(j_nu_syn_eff_4D * volume_element[:,:,:,np.newaxis], axis=(0,1,2))
+    L_IC_nu  = np.sum(j_nu_IC_4D      * volume_element[:,:,:,np.newaxis], axis=(0,1,2))
+    L_tot_nu = L_syn_nu + L_IC_nu
+
+    # ── Plot ───────────────────────────────────────────────────────────────────
+    fig, ax = plt.subplots(figsize=(9,5), facecolor='#f9fafb')
+    ax.set_facecolor('#ffffff')
+    ax.plot(nu_array, nu_array*L_syn_nu, color='#2563eb', linewidth=2.2, label='Synchrotron')
+    ax.plot(nu_array, nu_array*L_IC_nu,  color='#f97316', linewidth=2.2, label='Inverse Compton')
+    ax.plot(nu_array, nu_array*L_tot_nu, color='#111827', linewidth=2.0, alpha=0.55, label='Total')
+    ax.set_yscale('log'); ax.set_xscale('log')
+    ax.set_xlim(1e10, 1e22)
+    ax.set_ylim(1e32, 1e40)
+    ax.tick_params(colors='#4b5563', labelsize=12)
+    for sp in ax.spines.values(): sp.set_edgecolor('#e5e7eb')
+    ax.grid(True, color='#f3f4f6', linestyle='--', alpha=1.0)
+    ax.set_xlabel(r'$\\nu$ (Hz)', fontsize=16, color='#374151')
+    ax.set_ylabel(r'$\\nu L_\\nu
 
 async function loadPyodide_(){
   try{
     pyodide=await loadPyodide();
-    await pyodide.loadPackage(['numpy','matplotlib','pandas']);
+    await pyodide.loadPackage(['numpy','matplotlib','pandas','scipy']);
     pyReady=true;
-    setStatus('ready','Python ready — NumPy · Pandas · Matplotlib loaded');
+    setStatus('ready','Python ready');
     checkRunReady();
   }catch(e){
     setStatus('error','Python load failed');
@@ -656,7 +722,15 @@ async function runComputation(){
     setTimeout(()=>setStep(3),600);
     const result=await pyodide.runPythonAsync(PYTHON_CODE);
     const res=result.toJs({dict_converter:Object.fromEntries});
+
+    if(res.status==='error'){
+      throw new Error(res.msg);
+    }
+
     plotB64=res.img; csvOut=res.csv;
+    // clear any old error detail
+    const old=document.getElementById('errDetail');
+    if(old) old.style.display='none';
     setStep(4); markDone();
     refreshTable(csvOut);
     refreshPlot();
@@ -665,9 +739,225 @@ async function runComputation(){
     setStatus('ready',`Done — ${res.nfreq} spectral points`);
     if(activePanel===null)togglePanel('graph');
   }catch(e){
-    showAlert('alertCSV','Python error: '+e.message);
-    setStatus('error','Calculation failed');
-    pb.style.display='none';
+    const msg = e.message || String(e);
+    showAlert('alertCSV','❌ Error: ' + msg);
+    // Show a detail box with full traceback
+    let detail = document.getElementById('errDetail');
+    if(!detail){
+      detail = document.createElement('pre');
+      detail.id = 'errDetail';
+      detail.style.cssText = 'background:#1e1e2e;color:#f87171;font-size:0.72rem;font-family:monospace;padding:14px;border-radius:8px;overflow-x:auto;margin-top:10px;white-space:pre-wrap;max-height:200px;overflow-y:auto;border:1px solid #ef444450';
+      document.getElementById('progressBox').after(detail);
+    }
+    detail.textContent = msg;
+    detail.style.display = 'block';
+    setStatus('error','Calculation failed — see error below');
+    pb.style.display='block';
+  }
+  btn.innerHTML='▶ Run Code';
+  btn.disabled=false;
+}
+
+function setStep(n){
+  ['d1','d2','d3','d4'].forEach((d,i)=>{
+    const el=document.getElementById(d);
+    if(i<n-1)el.className='sd done';
+    else if(i===n-1)el.className='sd active';
+    else el.className='sd';
+  });
+}
+function markDone(){['d1','d2','d3','d4'].forEach(d=>document.getElementById(d).className='sd done');}
+
+function refreshTable(csv){
+  const lines=csv.split('\n').slice(1);
+  document.getElementById('rowCount').textContent=lines.length+' rows';
+  document.getElementById('tableBody').innerHTML=lines.map((line,i)=>{
+    const[f,s,ic,tot]=line.split(',');
+    return `<tr><td>${i+1}</td><td>${f}</td><td style="color:#2563eb">${s}</td><td style="color:#f97316">${ic}</td><td style="font-weight:600">${tot}</td></tr>`;
+  }).join('');
+}
+
+function refreshPlot(){
+  if(!plotB64)return;
+  const img=document.getElementById('plotImg');
+  img.src='data:image/png;base64,'+plotB64;
+  img.style.display='block';
+  document.getElementById('graphPlaceholder').style.display='none';
+}
+
+function togglePanel(which){
+  const pD=document.getElementById('panelData'),pG=document.getElementById('panelGraph');
+  const bD=document.getElementById('btnData'),bG=document.getElementById('btnGraph');
+  if(activePanel===which){
+    pD.classList.remove('visible');pG.classList.remove('visible');
+    bD.classList.remove('active');bG.classList.remove('active');
+    activePanel=null;
+  }else{
+    pD.classList.toggle('visible',which==='data');
+    pG.classList.toggle('visible',which==='graph');
+    bD.classList.toggle('active',which==='data');
+    bG.classList.toggle('active',which==='graph');
+    activePanel=which;
+  }
+}
+
+function downloadCSV(){
+  if(!csvOut)return;
+  const blob=new Blob([csvOut],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='SED_results.csv';a.click();
+  URL.revokeObjectURL(url);
+}
+function downloadPNG(){
+  if(!plotB64)return;
+  const a=document.createElement('a');
+  a.href='data:image/png;base64,'+plotB64;
+  a.download='SED_plot.png';a.click();
+}
+function showAlert(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='';}
+function showSuccess(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='';}
+function hideAlerts(){['alertCSV','successCSV'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});}
+
+loadPyodide_();
+</script>
+</body>
+</html>
+, fontsize=16, color='#374151')
+    ax.set_title('GRS 1915+105 Spectrum', fontsize=20, color='#111827', fontweight='bold', pad=14)
+    ax.legend(fontsize=20, framealpha=0.95)
+    fig.tight_layout()
+
+    buf = _io.BytesIO()
+    fig.savefig(buf, format='png', dpi=150, facecolor=fig.get_facecolor())
+    buf.seek(0)
+    img_b64 = base64.b64encode(buf.read()).decode()
+    plt.close(fig)
+
+    # ── CSV output ─────────────────────────────────────────────────────────────
+    rows = ['Freq,L_syn,L_IC,L_tot']
+    for i in range(Nfreq):
+        rows.append(f'{nu_array[i]:.6e},{L_syn_nu[i]:.6e},{L_IC_nu[i]:.6e},{L_tot_nu[i]:.6e}')
+    csv_out = chr(10).join(rows)
+
+    {'img': img_b64, 'csv': csv_out, 'nfreq': Nfreq, 'status': 'ok'}
+
+except Exception as _e:
+    {'status': 'error', 'msg': traceback.format_exc()}
+`;
+
+async function loadPyodide_(){
+  try{
+    pyodide=await loadPyodide();
+    await pyodide.loadPackage(['numpy','matplotlib','pandas','scipy']);
+    pyReady=true;
+    setStatus('ready','Python ready');
+    checkRunReady();
+  }catch(e){
+    setStatus('error','Python load failed');
+  }
+}
+
+function setStatus(state,msg){
+  document.getElementById('pyDot').className=state;
+  document.getElementById('pyMsg').textContent=msg;
+}
+
+function checkRunReady(){
+  const ok = pyReady && csvRaw !== null;
+  document.getElementById('btnRun').disabled = !ok;
+  document.getElementById('runHint').textContent = !pyReady
+    ? 'Waiting for Python environment to load…'
+    : !csvRaw
+    ? 'Please upload your simulation CSV file to enable the Run Code button.'
+    : 'All inputs ready — click Run Code to start the computation.';
+}
+
+function onDrag(e,s){e.preventDefault();document.getElementById('dropZone').classList.toggle('drag',s);}
+function onDrop(e){e.preventDefault();onDrag(e,false);handleFile(e.dataTransfer.files[0]);}
+
+function handleFile(file){
+  if(!file)return;
+  hideAlerts();
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    csvRaw=ev.target.result;
+    document.getElementById('fileName').textContent=file.name;
+    document.getElementById('fileBadge').style.display='';
+    showSuccess('successCSV',`"${file.name}" loaded successfully`);
+    checkRunReady();
+  };
+  reader.readAsText(file);
+}
+
+function clearFile(){
+  csvRaw=null;
+  document.getElementById('csvFile').value='';
+  document.getElementById('fileBadge').style.display='none';
+  hideAlerts();
+  checkRunReady();
+}
+
+function gv(id){return document.getElementById(id).value;}
+
+async function runComputation(){
+  if(!pyodide||!csvRaw)return;
+  hideAlerts();
+  const btn=document.getElementById('btnRun');
+  btn.innerHTML='<span class="spinner"></span> Computing…';
+  btn.disabled=true;
+  setStatus('running','Running calculation…');
+  const pb=document.getElementById('progressBox');
+  pb.style.display='block';
+  setStep(1);
+  try{
+    pyodide.globals.set('csv_content',csvRaw);
+    pyodide.globals.set('p_mbh',parseFloat(gv('p_mbh')));
+    pyodide.globals.set('p_mdot',parseFloat(gv('p_mdot')));
+    pyodide.globals.set('p_R',parseFloat(gv('p_R')));
+    pyodide.globals.set('p_mi',parseFloat(gv('p_mi')));
+    pyodide.globals.set('p_me',parseFloat(gv('p_me')));
+    pyodide.globals.set('p_nfreq',parseInt(gv('p_nfreq')));
+    pyodide.globals.set('p_numin',parseFloat(gv('p_numin')));
+    pyodide.globals.set('p_numax',parseFloat(gv('p_numax')));
+    pyodide.globals.set('p_taumax',parseFloat(gv('p_taumax')));
+    pyodide.globals.set('p_fcutoff',parseFloat(gv('p_fcutoff')));
+    pyodide.globals.set('p_nscattthin',parseInt(gv('p_nscattthin')));
+    pyodide.globals.set('p_nscattthick',parseInt(gv('p_nscattthick')));
+    setTimeout(()=>setStep(2),300);
+    setTimeout(()=>setStep(3),600);
+    const result=await pyodide.runPythonAsync(PYTHON_CODE);
+    const res=result.toJs({dict_converter:Object.fromEntries});
+
+    if(res.status==='error'){
+      throw new Error(res.msg);
+    }
+
+    plotB64=res.img; csvOut=res.csv;
+    // clear any old error detail
+    const old=document.getElementById('errDetail');
+    if(old) old.style.display='none';
+    setStep(4); markDone();
+    refreshTable(csvOut);
+    refreshPlot();
+    document.getElementById('btnDlCSV').disabled=false;
+    document.getElementById('btnDlPNG').disabled=false;
+    setStatus('ready',`Done — ${res.nfreq} spectral points`);
+    if(activePanel===null)togglePanel('graph');
+  }catch(e){
+    const msg = e.message || String(e);
+    showAlert('alertCSV','❌ Error: ' + msg);
+    // Show a detail box with full traceback
+    let detail = document.getElementById('errDetail');
+    if(!detail){
+      detail = document.createElement('pre');
+      detail.id = 'errDetail';
+      detail.style.cssText = 'background:#1e1e2e;color:#f87171;font-size:0.72rem;font-family:monospace;padding:14px;border-radius:8px;overflow-x:auto;margin-top:10px;white-space:pre-wrap;max-height:200px;overflow-y:auto;border:1px solid #ef444450';
+      document.getElementById('progressBox').after(detail);
+    }
+    detail.textContent = msg;
+    detail.style.display = 'block';
+    setStatus('error','Calculation failed — see error below');
+    pb.style.display='block';
   }
   btn.innerHTML='▶ Run Code';
   btn.disabled=false;
