@@ -5,7 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>GRMHD SED Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+<script>
+// Load Pyodide script dynamically so a CDN failure never blocks the page
+(function(){
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+  s.async = true;
+  s.onerror = function(){ window._pyLoadError = true; };
+  document.head.appendChild(s);
+})();
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -461,6 +470,7 @@ L_ν = ∫ j_ν dV
 
 <script>
 let pyodide=null, csvRaw=null, plotB64=null, csvOut=null, activePanel=null, pyReady=false;
+let _pyLoadAttempted=false;
 
 const PYTHON_CODE=`
 import numpy as np
@@ -657,21 +667,22 @@ function setStatus(state,msg){
   document.getElementById('pyMsg').textContent=msg;
 }
 
-function checkRunReady(){
-  const ok = pyReady && csvRaw !== null;
-  document.getElementById('btnRun').disabled = !ok;
-  document.getElementById('runHint').textContent = !pyReady
-    ? 'Waiting for Python environment to load…'
-    : !csvRaw
-    ? 'Please upload your simulation CSV file to enable the Run Code button.'
-    : 'All inputs ready — click Run Code to start the computation.';
-}
-
+// File upload is fully independent — works before Python is ready
 function onDrag(e,s){e.preventDefault();document.getElementById('dropZone').classList.toggle('drag',s);}
 function onDrop(e){e.preventDefault();onDrag(e,false);handleFile(e.dataTransfer.files[0]);}
 
+function triggerFilePicker(){
+  // Use a fresh click in a user-gesture context
+  document.getElementById('csvFile').value='';
+  document.getElementById('csvFile').click();
+}
+
 function handleFile(file){
   if(!file)return;
+  if(!file.name.toLowerCase().endsWith('.csv')){
+    showAlert('alertCSV','Please upload a .csv file.');
+    return;
+  }
   hideAlerts();
   const reader=new FileReader();
   reader.onload=ev=>{
@@ -680,7 +691,11 @@ function handleFile(file){
     document.getElementById('fileBadge').style.display='';
     showSuccess('successCSV',`"${file.name}" loaded successfully`);
     checkRunReady();
+    // Start loading Python now if not already started
+    // Start Python only after page is fully loaded — never blocks file upload
+window.addEventListener('load', ()=>setTimeout(loadPyodide_, 500));
   };
+  reader.onerror=()=>showAlert('alertCSV','Could not read file. Please try again.');
   reader.readAsText(file);
 }
 
