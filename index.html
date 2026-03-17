@@ -2,566 +2,549 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>SimAnalyst — GRMHD Spectrum Calculator</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SimAnalyst AI</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f6fa;color:#222}
-/* NAV */
-nav{background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:62px;position:sticky;top:0;z-index:100}
-.nav-logo{font-size:1.35rem;font-weight:700;letter-spacing:1px;color:#fff}
-.nav-logo span{color:#e87c2b}
-.nav-links{display:flex;gap:28px;font-size:0.93rem}
-.nav-links a{color:#ccc;text-decoration:none;transition:color 0.2s}
-.nav-links a:hover{color:#e87c2b}
-/* HERO */
-.hero{background:linear-gradient(120deg,#1a1a2e 60%,#16213e 100%);color:#fff;padding:56px 40px 48px;display:flex;align-items:center;gap:40px;min-height:220px}
-.hero-text{max-width:640px}
-.hero-badge{background:#e87c2b;color:#fff;font-size:0.75rem;font-weight:700;letter-spacing:1px;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:14px;text-transform:uppercase}
-.hero h1{font-size:2.1rem;font-weight:800;line-height:1.2;margin-bottom:12px}
-.hero h1 span{color:#e87c2b}
-.hero p{font-size:1rem;color:#b0b8d0;line-height:1.65;max-width:580px}
-.hero-stats{display:flex;gap:28px;margin-top:28px}
-.hstat{text-align:center}
-.hstat .num{font-size:1.5rem;font-weight:800;color:#e87c2b}
-.hstat .lbl{font-size:0.73rem;color:#8892a4;margin-top:2px}
-/* MAIN */
-.main{display:grid;grid-template-columns:1fr 1fr;gap:26px;padding:32px 40px;max-width:1300px;margin:0 auto}
-@media(max-width:900px){.main{grid-template-columns:1fr;padding:20px}}
-/* CARDS */
-.card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:28px 26px;margin-bottom:0}
-.card-title{font-size:1.05rem;font-weight:700;color:#1a1a2e;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.card-title .icon{width:26px;height:26px;background:#e87c2b;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
-.card-subtitle{font-size:0.82rem;color:#7a8299;margin-bottom:18px;line-height:1.5}
-/* UPLOAD */
-.upload-zone{border:2px dashed #d0d4e0;border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:#fafbff}
-.upload-zone:hover,.upload-zone.dragover{border-color:#e87c2b;background:#fff8f3}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a2e;background:#f8f9fa}
+nav{background:#1a1a2e;padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100}
+.logo{color:#fff;font-size:1.3rem;font-weight:700}
+.logo span{color:#e05c1a}
+.nav-links{display:flex;gap:2rem}
+.nav-links a{color:#ccc;font-size:0.9rem;text-decoration:none;transition:color 0.2s}
+.nav-links a:hover{color:#e05c1a}
+.hero{background:#1a1a2e;color:#fff;padding:60px 5%;display:flex;align-items:center;gap:4rem}
+.hero-text{flex:1}
+.hero-badge{background:#e05c1a;color:#fff;font-size:0.75rem;padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:1rem;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.hero h1{font-size:2.4rem;font-weight:800;line-height:1.2;margin-bottom:1rem}
+.hero h1 span{color:#e05c1a}
+.hero p{font-size:0.95rem;color:#aab4c8;line-height:1.7;max-width:520px;margin-bottom:2rem}
+.hero-stats{display:flex;gap:2.5rem}
+.hero-stat .num{font-size:1.4rem;font-weight:700;color:#e05c1a}
+.hero-stat .lbl{font-size:0.78rem;color:#aab4c8}
+.hero-panel{flex:0 0 340px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.5rem}
+.hero-panel-title{font-size:0.82rem;color:#e05c1a;font-weight:600;margin-bottom:1rem}
+.mini-row{margin-bottom:0.75rem}
+.mini-bar{height:7px;border-radius:4px;background:rgba(255,255,255,0.08);overflow:hidden;margin:4px 0}
+.mini-bar-fill{height:100%;border-radius:4px}
+.mini-label{font-size:0.72rem;color:#aab4c8;display:flex;justify-content:space-between}
+.container{max-width:1200px;margin:0 auto;padding:2.5rem 5%}
+.section-label{font-size:0.72rem;color:#e05c1a;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:0.4rem}
+.section-title{font-size:1.7rem;font-weight:700;margin-bottom:0.4rem;color:#1a1a2e}
+.section-sub{font-size:0.9rem;color:#666;margin-bottom:1.5rem;line-height:1.6}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.card{background:#fff;border-radius:12px;border:1px solid #e8eaf0;padding:1.5rem;margin-bottom:1.5rem}
+.card-title{font-size:0.95rem;font-weight:700;color:#1a1a2e;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
+.card-icon{width:26px;height:26px;background:#fff3ed;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.upload-zone{border:2px dashed #e05c1a44;border-radius:10px;padding:1.75rem;text-align:center;cursor:pointer;transition:all 0.2s;background:#fff8f5}
+.upload-zone:hover,.upload-zone.dragover{border-color:#e05c1a;background:#fff3ed}
+.upload-zone h3{font-size:0.95rem;font-weight:600;margin-bottom:0.3rem}
+.upload-zone p{font-size:0.8rem;color:#888}
 .upload-zone input{display:none}
-.upload-icon{font-size:2rem;margin-bottom:8px;color:#e87c2b}
-.upload-zone label{cursor:pointer;font-size:0.92rem;color:#555}
-.upload-zone label b{color:#e87c2b}
-.csv-note{background:#f0f4ff;border-left:3px solid #e87c2b;padding:10px 14px;border-radius:0 8px 8px 0;margin-top:14px;font-size:0.78rem;color:#445;line-height:1.6}
-.csv-note b{color:#1a1a2e;font-size:0.8rem}
-.file-status{margin-top:10px;font-size:0.83rem;color:#2e7d32;font-weight:600}
-/* PARAMS */
-.params-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:600px){.params-grid{grid-template-columns:1fr}}
-.param-group{display:flex;flex-direction:column;gap:3px}
-.param-group label{font-size:0.84rem;font-weight:600;color:#1a1a2e}
-.param-group .desc{font-size:0.72rem;color:#8a94aa;line-height:1.4}
-.param-group input{padding:7px 10px;border:1.5px solid #d8dce8;border-radius:7px;font-size:0.88rem;outline:none;transition:border-color 0.2s;background:#fafbff}
-.param-group input:focus{border-color:#e87c2b}
-/* BUTTONS */
-.btn-run{width:100%;padding:13px;background:#e87c2b;color:#fff;font-size:1rem;font-weight:700;border:none;border-radius:9px;cursor:pointer;margin-top:20px;transition:background 0.2s,transform 0.1s;letter-spacing:0.5px}
-.btn-run:hover{background:#d06a1a}
-.btn-run:active{transform:scale(0.98)}
-.btn-run:disabled{background:#aaa;cursor:not-allowed}
-/* STATUS */
-#status-box{display:none;margin-top:14px;padding:12px 14px;border-radius:8px;font-size:0.85rem;line-height:1.5}
-.status-info{background:#e8f4fd;border-left:3px solid #1976d2;color:#1a3a5c}
-.status-error{background:#fdecea;border-left:3px solid #d32f2f;color:#5c1a1a}
-.status-success{background:#e8f5e9;border-left:3px solid #388e3c;color:#1a3c20}
-/* RESULTS */
+.file-ok{background:#e8f5e9;border-radius:8px;padding:0.75rem 1rem;display:none;align-items:center;gap:0.75rem;margin-top:0.75rem}
+.file-ok .fn{font-size:0.85rem;font-weight:600;color:#2e7d32}
+.csv-note{background:#f0f4ff;border-left:3px solid #3b6dd4;border-radius:0 8px 8px 0;padding:0.7rem 1rem;margin-top:0.75rem;font-size:0.77rem;color:#444;line-height:1.6}
+.csv-note strong{color:#1a1a2e}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem}
+.pg{display:flex;flex-direction:column;gap:3px}
+.pg.full{grid-column:1/-1}
+.plabel{font-size:0.8rem;font-weight:600;color:#333}
+.pdesc{font-size:0.7rem;color:#888;line-height:1.4}
+.pinput{width:100%;padding:7px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-size:0.86rem;color:#1a1a2e;outline:none;transition:border-color 0.2s}
+.pinput:focus{border-color:#e05c1a}
+.pdef{font-size:0.68rem;color:#bbb}
+.psec{font-size:0.72rem;font-weight:700;color:#e05c1a;text-transform:uppercase;letter-spacing:1px;margin:0.75rem 0 0.25rem;grid-column:1/-1;padding-bottom:0.2rem;border-bottom:1px solid #f0e0d8}
+.run-btn{width:100%;padding:13px;background:#e05c1a;color:#fff;border:none;border-radius:10px;font-size:0.95rem;font-weight:700;cursor:pointer;transition:background 0.2s;margin-top:1rem}
+.run-btn:hover{background:#c44d14}
+.run-btn:disabled{background:#ccc;cursor:not-allowed}
+#sbox{margin-top:0.85rem;padding:0.7rem 1rem;border-radius:8px;font-size:0.83rem;display:none;line-height:1.5}
+#sbox.info{background:#e3f2fd;color:#1565c0;border-left:3px solid #1565c0}
+#sbox.ok{background:#e8f5e9;color:#2e7d32;border-left:3px solid #4caf50}
+#sbox.err{background:#ffebee;color:#c62828;border-left:3px solid #e53935}
+#sbox.warn{background:#fff8e1;color:#e65100;border-left:3px solid #ff9800}
 #results-panel{display:none}
-.result-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.07);padding:24px 26px;margin-bottom:24px}
-.result-card h3{font-size:1rem;font-weight:700;color:#1a1a2e;margin-bottom:14px;border-bottom:2px solid #f0f0f5;padding-bottom:8px}
-canvas#spectrum-canvas{width:100%;border-radius:8px;display:block}
-.dl-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
-.btn-dl{flex:1;min-width:140px;padding:10px 16px;border-radius:8px;font-size:0.88rem;font-weight:700;cursor:pointer;transition:background 0.2s;text-align:center;text-decoration:none;border:none}
-.btn-dl-csv{background:#1a1a2e;color:#fff}
-.btn-dl-csv:hover{background:#2d2d4e}
-.btn-dl-png{background:#e87c2b;color:#fff}
-.btn-dl-png:hover{background:#d06a1a}
-/* SECTION DIVIDER */
-.section-label{font-size:0.78rem;font-weight:700;color:#e87c2b;text-transform:uppercase;letter-spacing:1.5px;margin:22px 0 10px;padding-bottom:4px;border-bottom:2px solid #f0eae0}
-/* PROGRESS */
-#progress-bar-wrap{display:none;margin-top:12px}
-.pb-outer{background:#e0e4f0;border-radius:20px;height:8px;overflow:hidden}
-.pb-inner{background:#e87c2b;height:8px;width:0%;transition:width 0.3s;border-radius:20px}
-/* FOOTER */
-footer{background:#1a1a2e;color:#8892a4;text-align:center;font-size:0.8rem;padding:20px;margin-top:10px}
-footer a{color:#e87c2b;text-decoration:none}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.85rem;margin-bottom:1.25rem}
+.scard{background:#fff;border-radius:10px;border:1px solid #e8eaf0;padding:0.9rem;text-align:center}
+.scard .sv{font-size:1.05rem;font-weight:700;color:#e05c1a;font-family:monospace}
+.scard .sl{font-size:0.72rem;color:#888;margin-top:2px}
+.res-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.85rem;flex-wrap:wrap;gap:0.5rem}
+.dl-btns{display:flex;gap:0.6rem}
+.dl-btn{padding:7px 14px;border-radius:7px;font-size:0.8rem;font-weight:600;cursor:pointer;border:1.5px solid #e05c1a;background:#fff;color:#e05c1a;transition:all 0.2s}
+.dl-btn:hover{background:#e05c1a;color:#fff}
+.chart-wrap{background:#fff;border-radius:12px;border:1px solid #e8eaf0;padding:1.25rem}
+#placeholder{text-align:center;padding:3rem 1.5rem}
+#placeholder .pi{font-size:2.8rem;margin-bottom:0.75rem}
+#placeholder p{font-size:0.85rem;color:#999;line-height:1.6}
+footer{background:#1a1a2e;color:#aab4c8;text-align:center;padding:1.5rem 5%;margin-top:2.5rem;font-size:0.82rem}
+footer strong{color:#e05c1a}
+#pyload{position:fixed;inset:0;background:rgba(26,26,46,0.93);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;color:#fff}
+#pyload h2{font-size:1.2rem;margin-bottom:0.4rem}
+#pyload p{color:#aab4c8;font-size:0.85rem}
+.spin{width:44px;height:44px;border:4px solid rgba(255,255,255,0.12);border-top-color:#e05c1a;border-radius:50%;animation:sp 0.8s linear infinite;margin-bottom:1.25rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(max-width:768px){.two-col,.pgrid{grid-template-columns:1fr}.hero{flex-direction:column}.hero-panel{display:none}.stats-row{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
+<div id="pyload">
+  <div class="spin"></div>
+  <h2>Loading Scientific Python Engine</h2>
+  <p>Initializing Pyodide + NumPy + SciPy — please wait...</p>
+</div>
+
 <nav>
-  <div class="nav-logo">Sim<span>Analyst</span></div>
+  <div class="logo">Sim<span>Analyst</span> AI</div>
   <div class="nav-links">
-    <a href="#upload-section">Upload</a>
-    <a href="#params-section">Parameters</a>
-    <a href="#results-panel">Results</a>
-    <a href="https://github.com" target="_blank">GitHub</a>
+    <a href="#upload">Upload</a>
+    <a href="#params">Parameters</a>
+    <a href="#results">Results</a>
   </div>
 </nav>
 
-<!-- HERO -->
-<div class="hero">
+<section class="hero">
   <div class="hero-text">
-    <div class="hero-badge">Research Tool</div>
-    <h1>GRMHD Accretion Disk <span>Spectrum Calculator</span></h1>
-    <p>Upload your simulation output and compute synchrotron and inverse Compton spectra from GRMHD data. Calculates \(\nu L_\nu\) across a user-defined frequency range and generates publication-ready plots and downloadable data tables.</p>
+    <div class="hero-badge">GRMHD &bull; Broadband Spectral Analysis</div>
+    <h1>Black Hole Accretion<br/><span>Spectrum Calculator</span></h1>
+    <p>Upload your GRMHD simulation output, configure physical model parameters, and compute broadband synchrotron + inverse Compton spectra. Download publication-ready plots and tabulated luminosity data — all in your browser.</p>
     <div class="hero-stats">
-      <div class="hstat"><div class="num">3D</div><div class="lbl">Grid Support</div></div>
-      <div class="hstat"><div class="num">νL<sub>ν</sub></div><div class="lbl">Spectral Output</div></div>
-      <div class="hstat"><div class="num">IC+Syn</div><div class="lbl">Radiative Processes</div></div>
-      <div class="hstat"><div class="num">CSV+PNG</div><div class="lbl">Export Formats</div></div>
+      <div class="hero-stat"><div class="num">10⁹–10²²</div><div class="lbl">Hz frequency range</div></div>
+      <div class="hero-stat"><div class="num">3D Grid</div><div class="lbl">r, θ, φ support</div></div>
+      <div class="hero-stat"><div class="num">CSV + PNG</div><div class="lbl">Downloadable output</div></div>
     </div>
   </div>
-</div>
-
-<!-- MAIN GRID -->
-<div class="main">
-
-  <!-- LEFT COLUMN: UPLOAD + PARAMS -->
-  <div>
-
-    <!-- UPLOAD -->
-    <div class="card" id="upload-section">
-      <div class="card-title"><div class="icon">↑</div> Upload Simulation Data</div>
-      <div class="card-subtitle">Upload your GRMHD simulation output as a CSV file. The code will parse the 3D grid and field quantities automatically.</div>
-
-      <div class="upload-zone" id="drop-zone">
-        <input type="file" id="csv-input" accept=".csv"/>
-        <div class="upload-icon">📂</div>
-        <label for="csv-input">Drag & drop your CSV file here, or <b>click to browse</b></label>
-        <div id="file-status" class="file-status" style="display:none"></div>
-      </div>
-
-      <div class="csv-note">
-        <b>Required columns in CSV file:</b><br>
-        <b>r</b> — Radial coordinate grid (spherical) &nbsp;|&nbsp;
-        <b>h</b> — Polar angle \(\theta\) grid &nbsp;|&nbsp;
-        <b>phi</b> — Azimuthal \(\phi\) grid<br>
-        <b>rho</b> — Mass density \(\rho\) &nbsp;|&nbsp;
-        <b>B</b> — Magnetic field magnitude &nbsp;|&nbsp;
-        <b>pg</b> — Gas pressure<br>
-        <b>volume_element</b> — (Optional) Cell volume; computed as \(r^2 \sin\theta\,\Delta r\,\Delta\theta\,\Delta\phi\) if absent.<br>
-        Rows must be ordered in r-major (r-outer-loop) indexing. All quantities in CGS units.
-      </div>
+  <div class="hero-panel">
+    <div class="hero-panel-title">Spectral Components</div>
+    <div class="mini-row">
+      <div class="mini-label"><span>Synchrotron</span><span>radio → X-ray</span></div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:62%;background:#e05c1a"></div></div>
     </div>
-
-    <!-- PARAMS -->
-    <div class="card" id="params-section" style="margin-top:22px">
-      <div class="card-title"><div class="icon">⚙</div> Model Parameters</div>
-      <div class="card-subtitle">Set the physical and numerical parameters for the spectrum calculation. Defaults are pre-filled.</div>
-
-      <div class="section-label">Black Hole &amp; Accretion</div>
-      <div class="params-grid">
-        <div class="param-group">
-          <label>\(\dot{M}\) (in units of \(\dot{M}_\mathrm{Edd}\))</label>
-          <div class="desc">Mass accretion rate at the horizon, normalized to Eddington rate. Dimensionless.</div>
-          <input type="number" id="p_mdot" value="0.01" step="0.001" min="1e-6"/>
-        </div>
-        <div class="param-group">
-          <label>\(M_\mathrm{BH}\) (in units of \(M_\odot\))</label>
-          <div class="desc">Black hole mass. Set to 14 for a typical stellar-mass BH like GRS 1915+105.</div>
-          <input type="number" id="p_mbh" value="14" step="1" min="1"/>
-        </div>
-        <div class="param-group">
-          <label>\(\mu_i\) — mean mol. weight per ion</label>
-          <div class="desc">Mean molecular weight per ion. Default: 0.5 (fully ionized H plasma).</div>
-          <input type="number" id="p_mui" value="0.5" step="0.1" min="0.1"/>
-        </div>
-        <div class="param-group">
-          <label>\(\mu_e\) — mean mol. weight per electron</label>
-          <div class="desc">Mean molecular weight per electron. Default: 0.5 (fully ionized H plasma).</div>
-          <input type="number" id="p_mue" value="0.5" step="0.1" min="0.1"/>
-        </div>
-        <div class="param-group">
-          <label>\(R = T_p / T_e\)</label>
-          <div class="desc">Ion-to-electron temperature ratio. Controls the electron temperature and thus synchrotron output.</div>
-          <input type="number" id="p_R" value="300" step="10" min="1"/>
-        </div>
-      </div>
-
-      <div class="section-label">Frequency Grid</div>
-      <div class="params-grid">
-        <div class="param-group">
-          <label>\(N_\mathrm{freq}\) — frequency bins</label>
-          <div class="desc">Number of logarithmically spaced frequency bins. Default: 100.</div>
-          <input type="number" id="p_nfreq" value="100" step="10" min="10"/>
-        </div>
-        <div class="param-group">
-          <label>\(\nu_\mathrm{min}\) (Hz)</label>
-          <div class="desc">Minimum frequency for spectrum. Default: \(10^9\) Hz (radio).</div>
-          <input type="number" id="p_numin" value="1e9" step="1e8"/>
-        </div>
-        <div class="param-group">
-          <label>\(\nu_\mathrm{max}\) (Hz)</label>
-          <div class="desc">Maximum frequency for spectrum. Default: \(10^{22}\) Hz (hard X-ray/gamma).</div>
-          <input type="number" id="p_numax" value="1e22" step="1e20"/>
-        </div>
-      </div>
-
-      <div class="section-label">Compton &amp; Optical Depth</div>
-      <div class="params-grid">
-        <div class="param-group">
-          <label>\(\tau_\mathrm{max}\) — max optical depth</label>
-          <div class="desc">Optical depth above which the spectrum thermalizes (Comptonization saturates). Default: 10.</div>
-          <input type="number" id="p_taumax" value="10" step="1" min="1"/>
-        </div>
-        <div class="param-group">
-          <label>\(f_\mathrm{cutoff}\) — Wien cutoff factor</label>
-          <div class="desc">Multiplicative factor in the Wien exponential cutoff \(e^{-h\nu/kT_e f}\). Default: 2.</div>
-          <input type="number" id="p_fcutoff" value="2" step="0.5" min="0.5"/>
-        </div>
-        <div class="param-group">
-          <label>\(N_\mathrm{scatt,thin}\) — scatterings (thin)</label>
-          <div class="desc">Max Compton scattering orders in the optically thin region. Default: 5.</div>
-          <input type="number" id="p_nsthin" value="5" step="1" min="1"/>
-        </div>
-        <div class="param-group">
-          <label>\(N_\mathrm{scatt,thick}\) — scatterings (thick)</label>
-          <div class="desc">Max Compton scattering orders in the optically thick region. Default: 100.</div>
-          <input type="number" id="p_nsthick" value="100" step="10" min="1"/>
-        </div>
-      </div>
-
-      <button class="btn-run" id="run-btn" onclick="runSimulation()">▶ Run Spectrum Calculation</button>
-
-      <div id="progress-bar-wrap">
-        <div class="pb-outer"><div class="pb-inner" id="pb-inner"></div></div>
-        <div id="pb-label" style="font-size:0.78rem;color:#7a8299;margin-top:5px;text-align:center"></div>
-      </div>
-      <div id="status-box"></div>
+    <div class="mini-row">
+      <div class="mini-label"><span>Inverse Compton</span><span>X-ray → γ-ray</span></div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:85%;background:#3b6dd4"></div></div>
     </div>
+    <div class="mini-row">
+      <div class="mini-label"><span>Total ν L<sub>ν</sub></span><span>peak</span></div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:92%;background:#4caf50"></div></div>
+    </div>
+    <div style="margin-top:1rem;font-size:0.75rem;color:#aab4c8;line-height:1.5">Relativistic thermal synchrotron fitting formula with self-absorption and Comptonization via y-parameter formalism.</div>
   </div>
+</section>
 
-  <!-- RIGHT COLUMN: RESULTS -->
-  <div>
-    <div id="results-panel">
-      <div class="result-card">
-        <h3>Spectrum: \(\nu L_\nu\) vs \(\nu\)</h3>
-        <canvas id="spectrum-canvas" height="420"></canvas>
-        <div class="dl-row">
-          <button class="btn-dl btn-dl-png" id="btn-png" onclick="downloadPNG()">⬇ Download Plot (PNG)</button>
-          <button class="btn-dl btn-dl-csv" id="btn-csv" onclick="downloadCSV()">⬇ Download Data (CSV)</button>
+<div class="container">
+  <div class="two-col">
+
+    <!-- LEFT -->
+    <div>
+      <div class="section-label">Step 1</div>
+      <div class="section-title">Upload &amp; Configure</div>
+      <div class="section-sub">Provide your GRMHD simulation CSV and set the physical model parameters below.</div>
+
+      <div class="card" id="upload">
+        <div class="card-title"><span class="card-icon">📂</span> CSV Data File</div>
+        <div class="upload-zone" id="dropZone" onclick="document.getElementById('csvFile').click()">
+          <div style="font-size:2rem;margin-bottom:0.4rem">⬆</div>
+          <h3>Drag &amp; drop your CSV file here</h3>
+          <p>or click to browse — .csv files only</p>
+          <input type="file" id="csvFile" accept=".csv"/>
+        </div>
+        <div class="file-ok" id="fileOk">
+          <span style="font-size:1.1rem">✅</span>
+          <div><div class="fn" id="fileName">—</div><div style="font-size:0.73rem;color:#666" id="fileRows">—</div></div>
+        </div>
+        <div class="csv-note">
+          <strong>Required CSV columns:</strong><br/>
+          <strong>r</strong> — radial grid (code units) &bull;
+          <strong>h</strong> — polar angle θ grid &bull;
+          <strong>phi</strong> — azimuthal φ grid &bull;
+          <strong>rho</strong> — mass density &bull;
+          <strong>B</strong> — magnetic field (Gaussian CGS) &bull;
+          <strong>pg</strong> — gas pressure (dyn cm⁻²) &bull;
+          <strong>volume_element</strong> — cell volume <em>(optional; auto-computed as r² sinθ Δr Δθ Δφ if absent)</em>.<br/>
+          Rows must be in <strong>r-major</strong> (r → θ → φ) order.
         </div>
       </div>
-    </div>
-    <div id="placeholder-panel">
-      <div class="result-card" style="text-align:center;padding:60px 30px;color:#aab">
-        <div style="font-size:3rem;margin-bottom:16px">📡</div>
-        <div style="font-size:1rem;font-weight:600;color:#556;margin-bottom:8px">No results yet</div>
-        <div style="font-size:0.85rem;color:#9a9db0;line-height:1.6">Upload your simulation CSV, set model parameters,<br>and click <b>Run</b> to generate the spectrum.</div>
+
+      <div class="card" id="params">
+        <div class="card-title"><span class="card-icon">⚙</span> Model Parameters</div>
+        <div class="pgrid">
+
+          <div class="psec">Black Hole &amp; Accretion</div>
+
+          <div class="pg">
+            <div class="plabel">ṁ &nbsp;(ṁ / ṁ<sub>Edd</sub>)</div>
+            <div class="pdesc">Mass accretion rate at horizon in units of the Eddington rate</div>
+            <input class="pinput" id="p_mdot" type="number" value="0.01" step="0.001" min="1e-6"/>
+            <div class="pdef">e.g. 0.01 for GRS 1915+105</div>
+          </div>
+
+          <div class="pg">
+            <div class="plabel">M<sub>BH</sub> &nbsp;(M<sub>☉</sub>)</div>
+            <div class="pdesc">Black hole mass in solar masses — sets gravitational &amp; Eddington scales</div>
+            <input class="pinput" id="p_mbh" type="number" value="14" step="1" min="1"/>
+            <div class="pdef">e.g. 14 M<sub>☉</sub> for GRS 1915+105</div>
+          </div>
+
+          <div class="psec">Plasma Composition</div>
+
+          <div class="pg">
+            <div class="plabel">μ<sub>i</sub></div>
+            <div class="pdesc">Mean molecular weight per ion; ≈ 0.5 for fully ionized hydrogen</div>
+            <input class="pinput" id="p_mui" type="number" value="0.5" step="0.1" min="0.1"/>
+            <div class="pdef">Default: 0.5</div>
+          </div>
+
+          <div class="pg">
+            <div class="plabel">μ<sub>e</sub></div>
+            <div class="pdesc">Mean molecular weight per electron; ≈ 0.5 for pure hydrogen plasma</div>
+            <input class="pinput" id="p_mue" type="number" value="0.5" step="0.1" min="0.1"/>
+            <div class="pdef">Default: 0.5</div>
+          </div>
+
+          <div class="pg full">
+            <div class="plabel">R = T<sub>p</sub> / T<sub>e</sub></div>
+            <div class="pdesc">Proton-to-electron temperature ratio. Higher R → cooler electrons → lower synchrotron luminosity. Typical range 1–10³ for hot accretion flows.</div>
+            <input class="pinput" id="p_R" type="number" value="300" step="10" min="1"/>
+            <div class="pdef">e.g. 300 for MAD/SANE hot accretion flows</div>
+          </div>
+
+          <div class="psec">Frequency Grid</div>
+
+          <div class="pg">
+            <div class="plabel">N<sub>freq</sub></div>
+            <div class="pdesc">Number of log-spaced frequency bins. More bins = smoother spectrum but slower.</div>
+            <input class="pinput" id="p_Nfreq" type="number" value="100" step="10" min="10" max="500"/>
+            <div class="pdef">Default: 100</div>
+          </div>
+
+          <div class="pg">
+            <div class="plabel">ν<sub>min</sub> (Hz)</div>
+            <div class="pdesc">Minimum frequency — set to radio (∼10⁹ Hz) to capture self-absorbed synchrotron</div>
+            <input class="pinput" id="p_numin" type="number" value="1e9"/>
+            <div class="pdef">Default: 10⁹ Hz</div>
+          </div>
+
+          <div class="pg">
+            <div class="plabel">ν<sub>max</sub> (Hz)</div>
+            <div class="pdesc">Maximum frequency — set to ∼10²² Hz to include hard X-ray IC emission</div>
+            <input class="pinput" id="p_numax" type="number" value="1e22"/>
+            <div class="pdef">Default: 10²² Hz</div>
+          </div>
+
+          <div class="psec">Compton Scattering</div>
+
+          <div class="pg">
+            <div class="plabel">τ<sub>max</sub></div>
+            <div class="pdesc">Max optical depth above which spectrum thermalizes — caps Compton y-parameter</div>
+            <input class="pinput" id="p_taumax" type="number" value="10" step="1" min="1"/>
+            <div class="pdef">Default: 10</div>
+          </div>
+
+          <div class="pg">
+            <div class="plabel">f<sub>cutoff</sub></div>
+            <div class="pdesc">Wien cutoff factor modifying exp(−hν / k<sub>B</sub>T<sub>e</sub> · f). Smaller = sharper cutoff.</div>
+            <input class="pinput" id="p_fcutoff" type="number" value="2" step="0.5" min="0.1"/>
+            <div class="pdef">Default: 2</div>
+          </div>
+
+          <div class="pg">
+            <div class="plabel">N<sub>scatt,thin</sub></div>
+            <div class="pdesc">Max Compton up-scatterings in optically thin regime (τ &lt; 1)</div>
+            <input class="pinput" id="p_Nthin" type="number" value="5" step="1" min="1"/>
+            <div class="pdef">Default: 5</div>
+          </div>
+
+          <div class="pg">
+            <div class="plabel">N<sub>scatt,thick</sub></div>
+            <div class="pdesc">Max Compton up-scatterings in optically thick regime (τ ≥ 1)</div>
+            <input class="pinput" id="p_Nthick" type="number" value="100" step="10" min="1"/>
+            <div class="pdef">Default: 100</div>
+          </div>
+
+          <div class="psec">Volume Element</div>
+
+          <div class="pg full">
+            <div class="plabel">Volume element source</div>
+            <div class="pdesc">If your CSV has a <strong>volume_element</strong> column, select "Use CSV column". Otherwise it is computed as r² sinθ Δr Δθ Δφ from the grid.</div>
+            <select class="pinput" id="p_vol">
+              <option value="auto">Auto-compute from grid (r² sinθ Δr Δθ Δφ)</option>
+              <option value="csv">Use volume_element column from CSV</option>
+            </select>
+          </div>
+
+        </div>
+
+        <button class="run-btn" id="runBtn" disabled onclick="runCalc()">▶ &nbsp;Run Spectral Calculation</button>
+        <div id="sbox"></div>
       </div>
     </div>
-  </div>
 
+    <!-- RIGHT -->
+    <div id="results">
+      <div class="section-label">Step 2</div>
+      <div class="section-title">Results &amp; Downloads</div>
+      <div class="section-sub">Your computed spectrum appears here once the calculation is complete. Export the spectrum as CSV or download a publication-ready PNG plot.</div>
+
+      <div id="results-panel">
+        <div class="stats-row">
+          <div class="scard"><div class="sv" id="sp_syn">—</div><div class="sl">Peak ν L<sub>ν</sub> Synchrotron</div></div>
+          <div class="scard"><div class="sv" id="sp_ic">—</div><div class="sl">Peak ν L<sub>ν</sub> IC</div></div>
+          <div class="scard"><div class="sv" id="sp_tot">—</div><div class="sl">Peak ν L<sub>ν</sub> Total</div></div>
+        </div>
+        <div class="res-top">
+          <div style="font-size:0.88rem;font-weight:600;color:#1a1a2e">Broadband Spectrum — ν L<sub>ν</sub> vs ν</div>
+          <div class="dl-btns">
+            <button class="dl-btn" onclick="dlCSV()">⬇ CSV</button>
+            <button class="dl-btn" onclick="dlPNG()">⬇ PNG</button>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="specChart"></canvas></div>
+      </div>
+
+      <div class="card" id="placeholder">
+        <div class="pi">📊</div>
+        <p><strong>No results yet.</strong><br/>Upload your simulation CSV, set model parameters, and click <em>Run Spectral Calculation</em> to generate the broadband spectrum.</p>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <footer>
-  SimAnalyst — GRMHD Spectrum Calculator &nbsp;|&nbsp;
-  For queries contact: <a href="#">your-email@iisc.ac.in</a> &nbsp;|&nbsp;
-  Powered by <a href="https://pyodide.org" target="_blank">Pyodide</a> &amp; Python in the browser
+  <strong>SimAnalyst AI</strong> &mdash; GRMHD Broadband Spectrum Calculator &bull; Synchrotron + Inverse Compton &bull; Runs entirely in your browser &bull; No data leaves your machine
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
-let csvData = null;
-let resultData = null;
-let pyodideReady = false;
-let pyodide = null;
-let spectrumChart = null;
+let pyodide=null, csvRaw=null, specRes=null, chart=null;
 
-// Drag-drop
-const dz = document.getElementById('drop-zone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
-document.getElementById('csv-input').addEventListener('change', e => handleFile(e.target.files[0]));
-
-function handleFile(file) {
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    csvData = e.target.result;
-    const fs = document.getElementById('file-status');
-    fs.style.display = 'block';
-    fs.textContent = `✓ Loaded: ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
-  };
-  reader.readAsText(file);
-}
-
-function setStatus(msg, type) {
-  const b = document.getElementById('status-box');
-  b.style.display = 'block';
-  b.className = 'status-' + type;
-  b.innerHTML = msg;
-}
-
-function setProgress(pct, label) {
-  document.getElementById('progress-bar-wrap').style.display = 'block';
-  document.getElementById('pb-inner').style.width = pct + '%';
-  document.getElementById('pb-label').textContent = label;
-}
-
-async function loadPyodide() {
-  if (pyodideReady) return pyodide;
-  setStatus('Loading Python runtime (Pyodide)... this may take ~15s on first run.', 'info');
-  setProgress(10, 'Downloading Pyodide runtime...');
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js';
-  document.head.appendChild(script);
-  await new Promise(r => script.onload = r);
-  setProgress(30, 'Initializing Python...');
-  pyodide = await window.loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/' });
-  setProgress(55, 'Installing numpy, pandas, scipy...');
-  await pyodide.loadPackage(['numpy', 'pandas', 'scipy']);
-  pyodideReady = true;
-  setProgress(70, 'Python environment ready.');
-  return pyodide;
-}
-
-async function runSimulation() {
-  if (!csvData) { setStatus('Please upload a CSV file first.', 'error'); return; }
-  const btn = document.getElementById('run-btn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Running...';
-  try {
-    const py = await loadPyodide();
-    setProgress(75, 'Parsing CSV and running spectrum calculation...');
-
-    // Read params
-    const mdot = parseFloat(document.getElementById('p_mdot').value);
-    const mBH = parseFloat(document.getElementById('p_mbh').value);
-    const mu_i = parseFloat(document.getElementById('p_mui').value);
-    const mu_e = parseFloat(document.getElementById('p_mue').value);
-    const R = parseFloat(document.getElementById('p_R').value);
-    const Nfreq = parseInt(document.getElementById('p_nfreq').value);
-    const nu_min = parseFloat(document.getElementById('p_numin').value);
-    const nu_max = parseFloat(document.getElementById('p_numax').value);
-    const tau_max = parseFloat(document.getElementById('p_taumax').value);
-    const f_cutoff = parseFloat(document.getElementById('p_fcutoff').value);
-    const N_thin = parseInt(document.getElementById('p_nsthin').value);
-    const N_thick = parseInt(document.getElementById('p_nsthick').value);
-
-    py.globals.set('csv_string', csvData);
-    py.globals.set('mdot_P', mdot);
-    py.globals.set('mBH', mBH);
-    py.globals.set('mu_i_in', mu_i);
-    py.globals.set('mu_e_in', mu_e);
-    py.globals.set('R_in', R);
-    py.globals.set('Nfreq_in', Nfreq);
-    py.globals.set('nu_min_in', nu_min);
-    py.globals.set('nu_max_in', nu_max);
-    py.globals.set('tau_max_in', tau_max);
-    py.globals.set('f_cutoff_in', f_cutoff);
-    py.globals.set('N_thin_in', N_thin);
-    py.globals.set('N_thick_in', N_thick);
-
-    const pyCode = `
-import numpy as np
-import pandas as pd
-from scipy.special import kn
-import io
-
-rad_eff = 0.1
-cl = 2.998e10
-G = 6.674e-8
-e = 4.803e-10
-sigT = 6.65245873e-25
-mp = 1.67262171e-24
-me = 9.109e-28
-kB = 1.3806e-16
-hPl = 6.626e-27
-M_sun = 1.989e33
-
-mBH_val = mBH
-mass_BH = mBH_val * M_sun
-mu_i = mu_i_in
-mu_e = mu_e_in
-R = R_in
-Nfreq = Nfreq_in
-nu_min_Hz = nu_min_in
-nu_max_Hz = nu_max_in
-tau_max_val = tau_max_in
-f_cutoff_val = f_cutoff_in
-N_thin = N_thin_in
-N_thick = N_thick_in
-
-df = pd.read_csv(io.StringIO(csv_string))
-r_arr = np.sort(df['r'].unique())
-h_arr = np.sort(df['h'].unique())
-phi_arr = np.sort(df['phi'].unique())
-r_res, th_res, phi_res = len(r_arr), len(h_arr), len(phi_arr)
-
-rho = df['rho'].values.reshape(r_res, th_res, phi_res)
-B   = df['B'].values.reshape(r_res, th_res, phi_res)
-pg  = df['pg'].values.reshape(r_res, th_res, phi_res)
-
-if 'volume_element' in df.columns:
-    vol = df['volume_element'].values.reshape(r_res, th_res, phi_res)
-else:
-    dr = r_arr[1]-r_arr[0] if len(r_arr)>1 else 1.0
-    dh = h_arr[1]-h_arr[0] if len(h_arr)>1 else 1.0
-    dp = phi_arr[1]-phi_arr[0] if len(phi_arr)>1 else 1.0
-    vol = (r_arr[:,np.newaxis,np.newaxis]**2) * np.sin(h_arr[np.newaxis,:,np.newaxis]) * dr * dh * dp
-
-Tp = (mu_i * pg * mp) / (kB * rho + 1e-50)
-Te = Tp / R
-Theta_e = kB * Te / (me * cl**2)
-ne = rho / (mu_e * mp + 1e-50)
-
-nu_s = (e * B) / (2 * np.pi * me * cl + 1e-50)
-nu_c = 1.5 * nu_s * Theta_e**2 + 1e-50
-
-dP_dtheta = np.gradient(pg, h_arr, axis=1)
-dP_dz = np.abs(dP_dtheta) / (r_arr[:,np.newaxis,np.newaxis] + 1e-50) + 1e-50
-length_scale = pg / dP_dz
-
-tau = ne * sigT * length_scale
-tau_eff = np.minimum(np.maximum(tau, tau**2), tau_max_val)
-y_compton = 4.0 * Theta_e * tau_eff
-A_amp = 1.0 + 4.0*Theta_e + 16.0*Theta_e**2
-
-Theta_e_safe = np.maximum(Theta_e, 1e-10)
-K2_val = kn(2, 1.0/Theta_e_safe)
-K2_val = np.maximum(K2_val, 1e-50)
-
-N_max = np.where(tau < 1, N_thin, N_thick).astype(float)
-N_cap = np.minimum(tau_eff, N_max)
-
-nu_array = np.logspace(np.log10(nu_min_Hz), np.log10(nu_max_Hz), Nfreq)
-
-j_syn = np.zeros((r_res, th_res, phi_res, Nfreq))
-j_syn_eff = np.zeros((r_res, th_res, phi_res, Nfreq))
-j_IC = np.zeros((r_res, th_res, phi_res, Nfreq))
-
-for ifreq in range(Nfreq):
-    nu = nu_array[ifreq]
-    X = nu / nu_c
-    X = np.maximum(X, 1e-50)
-    pf = np.sqrt(2)*np.pi*e**2*ne*nu_c / (3*cl*K2_val)
-    shape = (X**0.5 + 2**(11/12)*X**(1/6))**2 * np.exp(-X**(1/3))
-    j_syn[:,:,:,ifreq] = pf * shape
-    tau_s = j_syn[:,:,:,ifreq] * cl**2 / (2*nu**2*kB*(Te+1e-50)) * length_scale
-    j_syn_eff[:,:,:,ifreq] = np.where(
-        tau_s > 0.1,
-        j_syn[:,:,:,ifreq] * (1-np.exp(-tau_s)) / (tau_s+1e-50),
-        j_syn[:,:,:,ifreq])
-
-log_nu = np.log10(nu_array)
-for ifreq in range(Nfreq):
-    nu_obs = nu_array[ifreq]
-    nu_seed = nu_obs / (A_amp**N_cap + 1e-50)
-    log_nu_seed = np.log10(nu_seed + 1e-50)
-    x_w = hPl * nu_obs / (kB * (Te+1e-50) * f_cutoff_val)
-    cut = np.exp(-np.minimum(x_w, 500))
-    j_seed = np.zeros((r_res, th_res, phi_res))
-    for i in range(r_res):
-        for j_idx in range(th_res):
-            for k in range(phi_res):
-                lg = np.log10(j_syn_eff[i,j_idx,k,:] + 1e-50)
-                j_seed[i,j_idx,k] = 10**np.interp(log_nu_seed[i,j_idx,k], log_nu, lg)
-    j_IC[:,:,:,ifreq] = y_compton * j_seed * cut
-
-L_syn = np.sum(j_syn[:,:,:,:] * vol[:,:,:,np.newaxis], axis=(0,1,2))
-L_syn_eff = np.sum(j_syn_eff[:,:,:,:] * vol[:,:,:,np.newaxis], axis=(0,1,2))
-L_IC = np.sum(j_IC[:,:,:,:] * vol[:,:,:,np.newaxis], axis=(0,1,2))
-L_tot = L_syn_eff + L_IC
-
-result = {
-    'nu': nu_array.tolist(),
-    'Lsyn': (nu_array*L_syn_eff).tolist(),
-    'LIC': (nu_array*L_IC).tolist(),
-    'Ltot': (nu_array*L_tot).tolist()
-}
-result
-`;
-
-    const result = await py.runPythonAsync(pyCode);
-    const res = result.toJs({ dict_converter: Object.fromEntries });
-
-    resultData = {
-      nu: Array.from(res.nu),
-      Lsyn: Array.from(res.Lsyn),
-      LIC: Array.from(res.LIC),
-      Ltot: Array.from(res.Ltot)
-    };
-
-    setProgress(95, 'Rendering plot...');
-    renderPlot(resultData);
-    setProgress(100, 'Done!');
-    setStatus('Calculation complete! Plot and data are ready to download below.', 'success');
-    document.getElementById('results-panel').style.display = 'block';
-    document.getElementById('placeholder-panel').style.display = 'none';
-    document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth' });
-
-  } catch(err) {
-    setStatus('Error: ' + err.message, 'error');
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '▶ Run Spectrum Calculation';
+async function initPy(){
+  try{
+    pyodide = await loadPyodide();
+    await pyodide.loadPackage(['numpy','scipy']);
+    document.getElementById('pyload').style.display='none';
+    setStatus('Python engine ready. Upload a CSV file to begin.','info');
+  } catch(e){
+    document.getElementById('pyload').innerHTML='<div style="color:#ff6b6b;text-align:center;padding:2rem"><h2>Failed to load Python engine</h2><p>Check internet connection and reload.</p></div>';
   }
 }
+initPy();
 
-function toLog10(arr) {
-  return arr.map(v => v > 0 ? Math.log10(v) : null);
+function setStatus(msg,t){const b=document.getElementById('sbox');b.innerHTML=msg;b.className=t;b.style.display='block';}
+
+const dz=document.getElementById('dropZone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('dragover');loadFile(e.dataTransfer.files[0]);});
+document.getElementById('csvFile').addEventListener('change',e=>loadFile(e.target.files[0]));
+
+function loadFile(f){
+  if(!f||!f.name.endsWith('.csv')){setStatus('Please upload a .csv file.','err');return;}
+  const r=new FileReader();
+  r.onload=e=>{
+    csvRaw=e.target.result;
+    const rows=csvRaw.split('\n').filter(l=>l.trim()).length-1;
+    document.getElementById('fileName').textContent=f.name;
+    document.getElementById('fileRows').textContent=`${rows.toLocaleString()} data rows`;
+    document.getElementById('fileOk').style.display='flex';
+    document.getElementById('runBtn').disabled=false;
+    setStatus(`"${f.name}" loaded (${rows.toLocaleString()} rows). Set parameters and run.`,'ok');
+  };
+  r.readAsText(f);
 }
 
-function renderPlot(d) {
-  const ctx = document.getElementById('spectrum-canvas').getContext('2d');
-  if (spectrumChart) spectrumChart.destroy();
+function gn(id){return parseFloat(document.getElementById(id).value);}
+function gi(id){return parseInt(document.getElementById(id).value);}
 
-  const logNu = toLog10(d.nu);
+async function runCalc(){
+  if(!pyodide||!csvRaw)return;
+  const btn=document.getElementById('runBtn');
+  btn.disabled=true; btn.textContent='⏳  Computing...';
+  setStatus('Parsing CSV and running spectrum calculation — this may take 10–30 seconds for large grids...','info');
 
-  spectrumChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: logNu.map(v => v ? v.toFixed(1) : ''),
-      datasets: [
-        { label: 'Synchrotron', data: toLog10(d.Lsyn), borderColor: '#3a86ff', borderWidth: 2, pointRadius: 0, tension: 0.3 },
-        { label: 'Inverse Compton', data: toLog10(d.LIC), borderColor: '#e87c2b', borderWidth: 2, pointRadius: 0, tension: 0.3 },
-        { label: 'Total', data: toLog10(d.Ltot), borderColor: '#1a1a2e', borderWidth: 2.5, pointRadius: 0, tension: 0.3, borderDash: [6,3] }
+  const p={
+    mu_i:gn('p_mui'), mu_e:gn('p_mue'), R:gn('p_R'),
+    Nfreq:gi('p_Nfreq'), nu_min:gn('p_numin'), nu_max:gn('p_numax'),
+    tau_max:gn('p_taumax'), f_cutoff:gn('p_fcutoff'),
+    N_thin:gi('p_Nthin'), N_thick:gi('p_Nthick'),
+    vol_mode:document.getElementById('p_vol').value
+  };
+
+  pyodide.globals.set('_csv', csvRaw);
+  pyodide.globals.set('_p', p);
+
+  const code=`
+import numpy as np, json
+from scipy.special import kn
+
+lines=[l for l in _csv.strip().split('\\n') if l.strip()]
+hdr=[h.strip() for h in lines[0].split(',')]
+raw=np.array([[float(v.strip()) for v in l.split(',')] for l in lines[1:] if l.strip()])
+
+def gc(name):
+    return raw[:,hdr.index(name)] if name in hdr else None
+
+r=np.unique(gc('r')); h=np.unique(gc('h')); phi=np.unique(gc('phi'))
+rr,tr,pr=len(r),len(h),len(phi)
+N=rr*tr*pr
+
+rho=gc('rho').reshape(rr,tr,pr)
+B  =gc('B').reshape(rr,tr,pr)
+pg =gc('pg').reshape(rr,tr,pr)
+
+vc=gc('volume_element')
+if vc is not None and _p['vol_mode']=='csv':
+    vol=vc.reshape(rr,tr,pr)
+else:
+    dr=r[1]-r[0] if rr>1 else 1.0
+    dh=h[1]-h[0] if tr>1 else 1.0
+    dp=phi[1]-phi[0] if pr>1 else 1.0
+    vol=(r[:,None,None]**2)*np.sin(h[None,:,None])*dr*dh*dp
+
+cl=2.998e10; e_=4.803e-10; sigT=6.65245873e-25
+mp=1.67262171e-24; me=9.109e-28; kB=1.3806e-16; hPl=6.626e-27
+
+mu_i=_p['mu_i']; mu_e=_p['mu_e']; R=_p['R']
+Nf=_p['Nfreq']; numin=_p['nu_min']; numax=_p['nu_max']
+taumax=_p['tau_max']; fc=_p['f_cutoff']
+Nth=float(_p['N_thin']); Ntk=float(_p['N_thick'])
+
+EPS=1e-300
+Tp=(mu_i*pg*mp)/(kB*rho+EPS)
+Te=Tp/R
+The=kB*Te/(me*cl**2)
+ne=rho/(mu_e*mp+EPS)
+nu_c=1.5*(e_*B/(2*np.pi*me*cl+EPS))*The**2
+
+dPdt=np.gradient(pg,h,axis=1)
+dPdz=np.abs(dPdt)/(r[:,None,None]+EPS)
+ls=pg/(dPdz+EPS)
+tau=ne*sigT*ls
+teff=np.minimum(np.maximum(tau,tau**2),taumax)
+yc=4.0*The*teff
+A=1.0+4.0*The+16.0*The**2
+Ncap=np.minimum(teff, np.where(tau<1,Nth,Ntk))
+
+nu_arr=np.logspace(np.log10(numin),np.log10(numax),Nf)
+K2=np.maximum(kn(2,1.0/(The+1e-10)),EPS)
+
+# --- Synchrotron (vectorized over freq) ---
+# Shape (rr,tr,pr,Nf)
+nu4=nu_arr[None,None,None,:]          # (1,1,1,Nf)
+nc4=nu_c[:,:,:,None]                  # (rr,tr,pr,1)
+X=nu4/(nc4+EPS)
+pref=(np.sqrt(2)*np.pi*e_**2*ne[:,:,:,None]*nc4)/(3*cl*K2[:,:,:,None]+EPS)
+shape=(X**0.5+2**(11/12)*X**(1/6))**2*np.exp(-np.minimum(X**(1/3),500))
+js=pref*shape                          # synchrotron emissivity
+
+Te4=Te[:,:,:,None]; ls4=ls[:,:,:,None]
+tau_s=js*cl**2/(2*nu4**2*kB*(Te4+EPS))*ls4
+js_eff=np.where(tau_s>0.1, js*(1-np.exp(-np.minimum(tau_s,500)))/(tau_s+EPS), js)
+
+# --- Inverse Compton (fully vectorized, no spatial loops) ---
+# For each freq index ifreq, nu_seed[i,j,k] = nu_arr[ifreq] / A[i,j,k]^N[i,j,k]
+# We interpolate js_eff spatially-flat along the freq axis.
+# Flatten spatial dims -> (N_spatial, Nf)
+js_flat=js_eff.reshape(N,Nf)           # (N,Nf)
+A_flat=A.ravel()                        # (N,)
+N_flat=Ncap.ravel()                     # (N,)
+Te_flat=Te.ravel()                      # (N,)
+log_nu=np.log10(nu_arr)                 # (Nf,)
+log_js=np.log10(js_flat+EPS)           # (N,Nf)
+
+jic_flat=np.zeros((N,Nf))
+yc_flat=yc.ravel()
+
+for ifreq in range(Nf):
+    nu_obs=nu_arr[ifreq]
+    nu_seed=nu_obs/(A_flat**N_flat+EPS)  # (N,)
+    log_ns=np.log10(nu_seed+EPS)         # (N,)
+    # Vectorized 1-D linear interp per spatial point
+    # np.searchsorted gives index into log_nu for each spatial point
+    idx=np.searchsorted(log_nu, log_ns).clip(1,Nf-1)  # (N,)
+    lo=idx-1; hi=idx
+    t=(log_ns-log_nu[lo])/(log_nu[hi]-log_nu[lo]+EPS)
+    t=np.clip(t,0,1)
+    log_jseed=log_js[np.arange(N),lo]*(1-t)+log_js[np.arange(N),hi]*t
+    j_seed=10**log_jseed                 # (N,)
+    x_wien=hPl*nu_obs/(kB*(Te_flat+EPS)*fc)
+    cutoff=np.exp(-np.minimum(x_wien,500))
+    jic_flat[:,ifreq]=yc_flat*j_seed*cutoff
+
+jic=jic_flat.reshape(rr,tr,pr,Nf)
+
+vol4=vol[:,:,:,None]
+Lsyn=np.sum(js_eff*vol4,axis=(0,1,2))
+Lic =np.sum(jic*vol4,axis=(0,1,2))
+Ltot=Lsyn+Lic
+
+json.dumps({'nu':nu_arr.tolist(),'Lsyn':Lsyn.tolist(),'Lic':Lic.tolist(),'Ltot':Ltot.tolist()})
+`;
+
+  try{
+    const res=await pyodide.runPythonAsync(code);
+    specRes=JSON.parse(res);
+    renderResults(specRes);
+    setStatus('✅ Calculation complete! Spectrum generated successfully.','ok');
+  } catch(err){
+    setStatus('❌ Error: '+err.message,'err');
+    console.error(err);
+  }
+  btn.disabled=false; btn.textContent='▶ Run Spectral Calculation';
+}
+
+function fmtE(v){
+  if(!v||!isFinite(v)||v<=0)return '—';
+  const e=Math.floor(Math.log10(v));
+  return `${(v/Math.pow(10,e)).toFixed(2)}×10^${e}`;
+}
+
+function renderResults(d){
+  document.getElementById('placeholder').style.display='none';
+  document.getElementById('results-panel').style.display='block';
+  const nLs=d.nu.map((n,i)=>n*d.Lsyn[i]);
+  const nLi=d.nu.map((n,i)=>n*d.Lic[i]);
+  const nLt=d.nu.map((n,i)=>n*d.Ltot[i]);
+  document.getElementById('sp_syn').textContent=fmtE(Math.max(...nLs));
+  document.getElementById('sp_ic').textContent =fmtE(Math.max(...nLi));
+  document.getElementById('sp_tot').textContent=fmtE(Math.max(...nLt));
+  if(chart)chart.destroy();
+  chart=new Chart(document.getElementById('specChart').getContext('2d'),{
+    type:'line',
+    data:{
+      labels:d.nu,
+      datasets:[
+        {label:'Synchrotron',data:nLs,borderColor:'#e05c1a',backgroundColor:'rgba(224,92,26,0.05)',borderWidth:2,pointRadius:0,tension:0.3},
+        {label:'Inverse Compton',data:nLi,borderColor:'#3b6dd4',backgroundColor:'rgba(59,109,212,0.05)',borderWidth:2,pointRadius:0,tension:0.3},
+        {label:'Total',data:nLt,borderColor:'#2e7d32',backgroundColor:'rgba(46,125,50,0.04)',borderWidth:2,pointRadius:0,tension:0.3,borderDash:[5,3]}
       ]
     },
-    options: {
-      responsive: true,
-      animation: false,
-      plugins: {
-        legend: { position: 'top', labels: { font: { size: 13 }, usePointStyle: true } },
-        title: { display: true, text: 'νLν Spectrum', font: { size: 15, weight: '600' }, color: '#1a1a2e' }
+    options:{
+      responsive:true,
+      scales:{
+        x:{type:'logarithmic',title:{display:true,text:'ν (Hz)',font:{size:12}},ticks:{callback:v=>`10^${Math.round(Math.log10(v))}`}},
+        y:{type:'logarithmic',title:{display:true,text:'ν Lν (erg s⁻¹)',font:{size:12}},ticks:{callback:v=>`10^${Math.round(Math.log10(v))}`}}
       },
-      scales: {
-        x: {
-          title: { display: true, text: 'log₁₀(ν / Hz)', font: { size: 13 } },
-          ticks: { maxTicksLimit: 8 },
-          grid: { color: 'rgba(0,0,0,0.05)' }
-        },
-        y: {
-          title: { display: true, text: 'log₁₀(νLν / erg s⁻¹)', font: { size: 13 } },
-          ticks: { maxTicksLimit: 8 },
-          grid: { color: 'rgba(0,0,0,0.05)' }
-        }
-      }
+      plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false}}
     }
   });
 }
 
-function downloadPNG() {
-  const c = document.getElementById('spectrum-canvas');
-  const a = document.createElement('a');
-  a.href = c.toDataURL('image/png');
-  a.download = 'spectrum_plot.png';
-  a.click();
+function dlCSV(){
+  if(!specRes)return;
+  let c='Freq (Hz),L_syn (erg/s/Hz),L_IC (erg/s/Hz),L_tot (erg/s/Hz)\n';
+  specRes.nu.forEach((n,i)=>c+=`${n},${specRes.Lsyn[i]},${specRes.Lic[i]},${specRes.Ltot[i]}\n`);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));
+  a.download='spectrum_output.csv';a.click();
 }
 
-function downloadCSV() {
-  if (!resultData) return;
-  let rows = ['Freq(Hz),L_syn(erg/s),L_IC(erg/s),L_tot(erg/s)'];
-  for (let i = 0; i < resultData.nu.length; i++) {
-    rows.push(`${resultData.nu[i].toExponential(6)},${resultData.Lsyn[i].toExponential(6)},${resultData.LIC[i].toExponential(6)},${resultData.Ltot[i].toExponential(6)}`);
-  }
-  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'spectrum_output.csv';
-  a.click();
+function dlPNG(){
+  if(!chart)return;
+  const a=document.createElement('a');
+  a.href=document.getElementById('specChart').toDataURL('image/png');
+  a.download='spectrum_plot.png';a.click();
 }
 </script>
 </body>
