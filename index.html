@@ -34,7 +34,7 @@ nav{background:#1a1a2e;padding:0 5%;display:flex;align-items:center;justify-cont
 .section-label{font-size:0.75rem;color:#e05c1a;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:0.5rem}
 .section-title{font-size:1.8rem;font-weight:700;margin-bottom:0.5rem;color:#1a1a2e}
 .section-sub{font-size:0.95rem;color:#666;margin-bottom:2rem;line-height:1.6}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.two-col{display:grid;grid-template-columns:1fr;gap:2rem;align-items:start;max-width:780px;margin:0 auto}
 .card{background:#fff;border-radius:12px;border:1px solid #e8eaf0;padding:1.5rem;margin-bottom:1.5rem}
 .card-title{font-size:1rem;font-weight:700;color:#1a1a2e;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}
 .card-title .icon{width:28px;height:28px;background:#fff3ed;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
@@ -112,11 +112,7 @@ footer strong{color:#e05c1a}
     <div class="hero-badge">Astrophysics &bull; GRMHD Spectral Analysis</div>
     <h1>Black Hole Accretion<br/><span>Spectrum Calculator</span></h1>
     <p>Upload your GRMHD simulation output, set physical model parameters, and compute broadband synchrotron and inverse Compton spectra. Download publication-ready plots and tabulated luminosity data.</p>
-    <div class="hero-stats">
-      <div class="hero-stat"><div class="num">10⁹–10²²</div><div class="lbl">Hz frequency range</div></div>
-      <div class="hero-stat"><div class="num">3D</div><div class="lbl">Grid support</div></div>
-      <div class="hero-stat"><div class="num">CSV + PNG</div><div class="lbl">Downloadable output</div></div>
-    </div>
+
   </div>
   <div class="hero-img">
     <div class="hero-img-title">Spectral Components</div>
@@ -134,7 +130,6 @@ footer strong{color:#e05c1a}
   <div class="two-col">
 
     <div>
-      <div class="section-label">Step 1</div>
       <div class="section-title">Upload Simulation Data</div>
       <div class="section-sub">Provide your GRMHD simulation output as a CSV file, then configure the physical model parameters below.</div>
 
@@ -262,13 +257,8 @@ footer strong{color:#e05c1a}
         <button class="run-btn" id="runBtn" disabled>▶ &nbsp; Run Spectral Calculation</button>
         <div id="status-box"></div>
       </div>
-    </div>
 
-    <div>
-      <div class="section-label">Step 2</div>
-      <div class="section-title">Results &amp; Downloads</div>
-      <div class="section-sub">Your computed synchrotron and inverse Compton spectrum will appear here.</div>
-
+      <!-- RESULTS below Run button -->
       <div id="results-panel">
         <div class="stats-row">
           <div class="stat-card"><div class="sv" id="s_peak_syn">—</div><div class="sl">Peak ν L<sub>ν</sub> Synchrotron (erg/s)</div></div>
@@ -276,7 +266,7 @@ footer strong{color:#e05c1a}
           <div class="stat-card"><div class="sv" id="s_peak_tot">—</div><div class="sl">Peak ν L<sub>ν</sub> Total (erg/s)</div></div>
         </div>
         <div class="results-top">
-          <div style="font-size:0.9rem;font-weight:600;color:#1a1a2e">Broadband Spectrum</div>
+          <div style="font-size:0.9rem;font-weight:600;color:#1a1a2e">Results</div>
           <div class="dl-btns">
             <button class="dl-btn" id="btnDlCSV">⬇ Download CSV</button>
             <button class="dl-btn" id="btnDlPNG">⬇ Download PNG</button>
@@ -288,7 +278,7 @@ footer strong{color:#e05c1a}
       <div id="no-results-placeholder" class="card" style="text-align:center;padding:3rem 1.5rem">
         <div style="font-size:3rem;margin-bottom:1rem">📊</div>
         <div style="font-size:1rem;font-weight:600;color:#555;margin-bottom:0.5rem">No results yet</div>
-        <div style="font-size:0.85rem;color:#999">Upload your simulation CSV, configure the model parameters on the left, and click <strong>Run Spectral Calculation</strong> to generate the spectrum.</div>
+        <div style="font-size:0.85rem;color:#999">Upload your simulation CSV, configure the model parameters, and click <strong>Run Spectral Calculation</strong> to generate the spectrum.</div>
       </div>
     </div>
 
