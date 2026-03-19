@@ -10,138 +10,140 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#f3f4f6;color:#111827}
 
-/* ── NAV ── */
-nav{background:#0f1117;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:56px;position:sticky;top:0;z-index:200}
+/* NAV */
+nav{background:#111827;padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
 .nav-logo{display:flex;align-items:center;gap:10px}
-.nav-logo .dot{width:28px;height:28px;background:#e05c1a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px}
+.nav-logo .dot{width:32px;height:32px;background:#f97316;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
 .nav-logo span{color:#fff;font-size:1rem;font-weight:700}
-.nav-logo span em{color:#e05c1a;font-style:normal}
-.nav-status{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:#9ca3af}
-.nav-dot{width:8px;height:8px;border-radius:50%;background:#6b7280}
-.nav-dot.ready{background:#22c55e}
-.nav-dot.running{background:#f59e0b;animation:blink 0.8s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.nav-btn{background:#e05c1a;color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:0.82rem;font-weight:600;cursor:pointer}
-.nav-btn:hover{background:#c44d14}
+.nav-logo span b{color:#f97316}
+.nav-status{display:flex;align-items:center;gap:8px}
+.py-dot{width:8px;height:8px;border-radius:50%;background:#6b7280}
+.py-dot.ready{background:#22c55e}
+.py-dot.running{background:#f97316}
+.py-dot.error{background:#ef4444}
+.py-msg{font-size:0.78rem;color:#9ca3af}
+.nav-btn{background:#f97316;color:#fff;border:none;padding:7px 18px;border-radius:6px;font-size:0.82rem;font-weight:600;cursor:pointer}
+.nav-btn:hover{background:#ea6c05}
 
-/* ── HERO ── */
-.hero{background:linear-gradient(135deg,#0f1117 0%,#1a1f2e 60%,#0f1117 100%);padding:60px 5% 50px;display:flex;gap:3rem;align-items:center}
-.hero-left{flex:1;min-width:0}
-.hero-eyebrow{font-size:0.7rem;font-weight:700;letter-spacing:2px;color:#e05c1a;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
-.hero-eyebrow::before,.hero-eyebrow::after{content:'';flex:0 0 28px;height:1.5px;background:#e05c1a}
-.hero h1{font-size:2.3rem;font-weight:800;color:#fff;line-height:1.2;margin-bottom:1rem}
-.hero h1 span{color:#e05c1a}
-.hero p{font-size:0.9rem;color:#9ca3af;line-height:1.7;max-width:500px;margin-bottom:1.75rem}
-.hero-btns{display:flex;gap:1rem;margin-bottom:2rem}
-.btn-primary{background:#e05c1a;color:#fff;border:none;border-radius:8px;padding:11px 22px;font-size:0.88rem;font-weight:600;cursor:pointer}
-.btn-primary:hover{background:#c44d14}
-.btn-outline{background:transparent;color:#fff;border:1.5px solid #374151;border-radius:8px;padding:11px 22px;font-size:0.88rem;font-weight:600;cursor:pointer}
-.btn-outline:hover{border-color:#6b7280}
-.hero-badges{display:flex;gap:1.25rem;flex-wrap:wrap}
-.hbadge{display:flex;flex-direction:column;gap:2px}
-.hbadge .bt{font-size:0.8rem;font-weight:700;color:#fff}
-.hbadge .bl{font-size:0.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px}
-.hero-right{flex:0 0 340px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:1.5rem}
-.eq-title{font-size:0.72rem;color:#e05c1a;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem}
-.eq-item{background:rgba(255,255,255,0.04);border-radius:8px;padding:0.6rem 0.9rem;margin-bottom:0.5rem;font-family:'Courier New',monospace;font-size:0.78rem;color:#d1d5db}
+/* HERO */
+.hero{background:#111827;color:#fff;padding:56px 5% 48px}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.hero-label{font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#f97316;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.hero-label::before,.hero-label::after{content:'';flex:0 0 32px;height:1.5px;background:#f97316}
+.hero h1{font-size:2.2rem;font-weight:800;line-height:1.2;margin-bottom:1rem}
+.hero h1 span{color:#f97316}
+.hero p{font-size:0.88rem;color:#9ca3af;line-height:1.7;margin-bottom:1.75rem}
+.hero-btns{display:flex;gap:1rem}
+.btn-primary{background:#f97316;color:#fff;border:none;padding:11px 22px;border-radius:7px;font-size:0.88rem;font-weight:700;cursor:pointer}
+.btn-primary:hover{background:#ea6c05}
+.btn-secondary{background:transparent;color:#fff;border:1.5px solid #374151;padding:11px 22px;border-radius:7px;font-size:0.88rem;font-weight:600;cursor:pointer}
+.btn-secondary:hover{border-color:#9ca3af}
+.hero-tags{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1.5rem}
+.hero-tag{background:#1f2937;border-radius:8px;padding:0.75rem 1rem}
+.hero-tag .t{font-size:0.78rem;font-weight:700;color:#fff}
+.hero-tag .s{font-size:0.68rem;color:#6b7280;margin-top:2px}
+.hero-right{display:flex;flex-direction:column;gap:1rem}
+.feature-row{display:flex;align-items:flex-start;gap:1rem;background:#1f2937;border-radius:10px;padding:1rem 1.25rem}
+.feature-icon{font-size:1.4rem;flex-shrink:0}
+.feature-row h4{font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:2px}
+.feature-row p{font-size:0.74rem;color:#6b7280;line-height:1.4}
+.formula-box{background:#1f2937;border-radius:10px;padding:1rem 1.25rem}
+.formula-box p{font-size:0.72rem;color:#9ca3af;line-height:2;font-family:monospace}
+.formula-box p span{color:#f97316}
 
-/* ── FEATURES STRIP ── */
-.features{background:#fff;border-bottom:1px solid #e5e7eb;padding:1.25rem 5%;display:flex;gap:2.5rem;flex-wrap:wrap}
-.feat{display:flex;align-items:flex-start;gap:0.75rem}
-.feat-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
-.feat-title{font-size:0.85rem;font-weight:700;color:#111827}
-.feat-sub{font-size:0.75rem;color:#6b7280;line-height:1.4}
+/* SECTION HEADER */
+.calc-header{max-width:100%;margin:0;text-align:center;padding:2.5rem 0 0.5rem}
+.calc-label{font-size:0.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#f97316;margin-bottom:0.5rem;display:flex;align-items:center;justify-content:center;gap:8px}
+.calc-label::before,.calc-label::after{content:'';flex:0 0 32px;height:1.5px;background:#f97316}
+.calc-header h2{font-size:1.75rem;font-weight:800;color:#111827;margin-bottom:0.5rem}
+.calc-header p{font-size:0.88rem;color:#6b7280;line-height:1.6}
 
-/* ── SECTION HEADER ── */
-.sec-hd{text-align:center;padding:2.5rem 5% 0.5rem}
-.sec-hd .label{font-size:0.7rem;font-weight:700;letter-spacing:2px;color:#e05c1a;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0.75rem}
-.sec-hd .label::before,.sec-hd .label::after{content:'';flex:0 0 28px;height:1.5px;background:#e05c1a}
-.sec-hd h2{font-size:1.9rem;font-weight:800;color:#111827;margin-bottom:0.5rem}
-.sec-hd p{font-size:0.88rem;color:#6b7280;max-width:560px;margin:0 auto}
+/* MAIN */
+.main{max-width:100%;margin:0;padding:1.5rem 0 3rem}
 
-/* ── MAIN CONTENT ── */
-.content{max-width:900px;margin:2rem auto;padding:0 4%}
-
-/* ── CARDS ── */
-.card{background:#fff;border-radius:14px;border:1px solid #e5e7eb;padding:1.5rem;margin-bottom:1.25rem}
+/* CARDS */
+.card{background:#fff;border-radius:0;border:none;border-bottom:1px solid #e5e7eb;padding:1.5rem 2rem;margin-bottom:0}
 .card-hd{display:flex;align-items:center;gap:10px;margin-bottom:1.1rem}
-.card-hd .ci{font-size:1.1rem;background:#fef3eb;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.card-hd-icon{width:32px;height:32px;background:#fef3c7;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .card-hd h3{font-size:0.95rem;font-weight:700;color:#111827}
-.card-hd p{font-size:0.75rem;color:#6b7280}
+.card-hd p{font-size:0.74rem;color:#6b7280}
 
-/* ── DROP ZONE ── */
-.drop-zone{border:2px dashed #d1d5db;border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:all 0.2s;background:#fafafa;position:relative}
-.drop-zone:hover,.drop-zone.drag{border-color:#e05c1a;background:#fff8f4}
+/* DROP ZONE */
+.drop-zone{border:2px dashed #d1d5db;border-radius:10px;padding:2.5rem 1rem;text-align:center;cursor:pointer;transition:all 0.2s;background:#f9fafb;position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:#f97316;background:#fff7ed}
 .drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .drop-icon{font-size:2.2rem;margin-bottom:0.5rem}
-.drop-zone h4{font-size:0.9rem;font-weight:600;color:#374151;margin-bottom:0.2rem}
+.drop-zone h4{font-size:0.9rem;font-weight:600;color:#111827;margin-bottom:0.2rem}
 .drop-zone p{font-size:0.78rem;color:#9ca3af}
-.file-badge{display:none;align-items:center;gap:8px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;padding:0.6rem 0.9rem;margin-top:0.75rem;font-size:0.82rem;color:#065f46;font-weight:600}
+.file-badge{display:none;align-items:center;gap:8px;background:#ecfdf5;border:1px solid #6ee7b7;border-radius:7px;padding:0.55rem 0.9rem;margin-top:0.75rem}
+.file-badge span{font-size:0.82rem;font-weight:600;color:#065f46;flex:1}
+.file-badge button{background:none;border:none;color:#6b7280;cursor:pointer;font-size:1rem;padding:0}
+.file-badge button:hover{color:#ef4444}
+.alert{display:none;padding:0.55rem 0.9rem;border-radius:7px;font-size:0.8rem;margin-top:0.6rem}
+.alert.err{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
+.alert.ok{background:#f0fdf4;color:#166534;border:1px solid #86efac}
 
-/* ── CSV COLUMNS ── */
-.col-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:1rem}
-.col-item{border:1px solid #fde68a;background:#fffbeb;border-radius:7px;padding:0.5rem 0.75rem}
-.col-item.opt{border-color:#a7f3d0;background:#ecfdf5}
-.col-name{font-size:0.8rem;font-weight:700;color:#b45309}
-.col-item.opt .col-name{color:#065f46}
-.col-desc{font-size:0.72rem;color:#6b7280}
-.col-item.full{grid-column:1/-1}
+/* COLUMN GRID */
+.col-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-top:0.9rem}
+.col-item{border:1.5px solid #fde68a;border-radius:7px;padding:0.5rem 0.75rem;background:#fffbeb}
+.col-item.opt{border-color:#a7f3d0;background:#f0fdf4}
+.col-item .cn{font-size:0.78rem;font-weight:700;color:#92400e}
+.col-item.opt .cn{color:#065f46}
+.col-item .cd{font-size:0.7rem;color:#78716c}
 
-/* ── PARAMS ── */
-.params-section-title{font-size:0.68rem;font-weight:700;color:#e05c1a;text-transform:uppercase;letter-spacing:1.5px;grid-column:1/-1;margin:0.5rem 0 0.1rem;padding-bottom:0.25rem;border-bottom:1px solid #fee2e2}
+/* PARAMS */
+.param-section-label{font-size:0.68rem;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:1.5px;margin:1.1rem 0 0.6rem;padding-bottom:0.3rem;border-bottom:1.5px solid #fed7aa}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem}
+.pgrid.one{grid-template-columns:1fr}
 .pg{display:flex;flex-direction:column;gap:3px}
-.pg.full{grid-column:1/-1}
-.pl{font-size:0.78rem;font-weight:600;color:#374151}
-.pd{font-size:0.68rem;color:#9ca3af;line-height:1.3}
-.pi{width:100%;padding:8px 10px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:0.85rem;color:#111827;outline:none;background:#fff;transition:border-color 0.2s}
-.pi:focus{border-color:#e05c1a}
-.pdef{font-size:0.63rem;color:#d1d5db}
+.pg label{font-size:0.78rem;font-weight:600;color:#374151}
+.pg .desc{font-size:0.68rem;color:#9ca3af;line-height:1.3}
+.pg input,.pg select{width:100%;padding:8px 10px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:0.84rem;color:#111827;outline:none;background:#fff;transition:border-color 0.2s}
+.pg input:focus,.pg select:focus{border-color:#f97316}
 
-/* ── READY BOX ── */
-.ready-box{background:#111827;border-radius:14px;padding:2rem;margin-bottom:1.5rem;text-align:center}
-.ready-box h3{font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:0.5rem}
-.ready-box p{font-size:0.84rem;color:#9ca3af;margin-bottom:1.25rem;line-height:1.6}
-#runHint{font-size:0.78rem;color:#6b7280;margin-bottom:1rem;min-height:1.2em}
-.run-btn-big{background:#e05c1a;color:#fff;border:none;border-radius:10px;padding:14px 32px;font-size:1rem;font-weight:700;cursor:pointer;width:100%;max-width:320px;transition:background 0.2s}
-.run-btn-big:hover{background:#c44d14}
-.run-btn-big:disabled{background:#6b7280;cursor:not-allowed}
+/* READY BOX */
+.ready-box{background:#111827;border-radius:12px;padding:1.5rem;margin-bottom:1.25rem;text-align:center}
+.ready-box h3{font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:0.4rem}
+.ready-box p{font-size:0.82rem;color:#9ca3af;margin-bottom:1.1rem;line-height:1.5}
+#runHint{font-size:0.75rem;color:#6b7280;margin-top:0.6rem}
+.btn-run{background:#f97316;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:0.95rem;font-weight:700;cursor:pointer;min-width:160px}
+.btn-run:hover{background:#ea6c05}
+.btn-run:disabled{background:#d1d5db;color:#9ca3af;cursor:not-allowed}
 
-/* ── PROGRESS ── */
-.prog-box{display:none;margin-top:1rem}
-.steps{display:flex;justify-content:center;gap:1.5rem;margin-bottom:0.75rem}
-.sd{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:0.7rem;color:#9ca3af}
-.sd .circle{width:28px;height:28px;border-radius:50%;border:2px solid #d1d5db;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:#9ca3af}
-.sd.active .circle{border-color:#e05c1a;color:#e05c1a;background:#fff8f4}
-.sd.done .circle{border-color:#22c55e;background:#22c55e;color:#fff}
+/* PROGRESS */
+.prog-box{display:none;background:#1f2937;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem}
+.steps{display:flex;gap:0.5rem;margin-bottom:0.75rem}
+.sd{flex:1;height:6px;border-radius:3px;background:#374151;transition:background 0.3s}
+.sd.done{background:#f97316}
+.prog-lbl{font-size:0.76rem;color:#9ca3af;text-align:center}
 
-/* ── STATUS / ALERTS ── */
-.alert{display:none;padding:0.6rem 0.9rem;border-radius:8px;font-size:0.8rem;margin-top:0.75rem}
-.alert.err{background:#fef2f2;color:#991b1b;border-left:3px solid #ef4444}
-.alert.ok{background:#f0fdf4;color:#166534;border-left:3px solid #22c55e}
-.alert.info{background:#eff6ff;color:#1e40af;border-left:3px solid #3b82f6}
+/* STATUS */
+#statusBox{margin-top:0.75rem;padding:0.6rem 0.9rem;border-radius:7px;font-size:0.8rem;display:none}
+#statusBox.info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+#statusBox.success{background:#f0fdf4;color:#166534;border:1px solid #86efac}
+#statusBox.error{background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5}
 
-/* ── RESULTS ── */
-#resultsSection{display:none;margin-bottom:2rem}
-.res-card{background:#fff;border-radius:14px;border:1px solid #e5e7eb;padding:1.5rem;margin-bottom:1rem}
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.9rem;margin-bottom:1.25rem}
-.stat{background:#fff8f4;border:1px solid #fde0d0;border-radius:10px;padding:0.9rem;text-align:center}
-.stat .sv{font-size:0.95rem;font-weight:700;color:#e05c1a;font-family:monospace}
-.stat .sl{font-size:0.68rem;color:#6b7280;margin-top:2px}
-.res-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+/* RESULTS */
+#resultsPanel{display:none;margin-top:0.5rem}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1rem}
+.stat-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:0.9rem;text-align:center}
+.stat-card .sv{font-size:0.95rem;font-weight:700;color:#f97316;font-family:monospace}
+.stat-card .sl{font-size:0.67rem;color:#6b7280;margin-top:2px}
+.res-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem}
+.res-hd h3{font-size:0.9rem;font-weight:700;color:#111827}
 .dl-btns{display:flex;gap:0.5rem}
-.dl-btn{padding:6px 14px;border-radius:7px;font-size:0.78rem;font-weight:600;cursor:pointer;border:1.5px solid #e05c1a;background:#fff;color:#e05c1a;transition:all 0.2s}
-.dl-btn:hover{background:#e05c1a;color:#fff}
-.chart-box{border:1px solid #e5e7eb;border-radius:10px;padding:1rem}
+.dl-btn{padding:6px 14px;border-radius:6px;font-size:0.77rem;font-weight:600;cursor:pointer;border:1.5px solid #f97316;background:#fff;color:#f97316;transition:all 0.2s}
+.dl-btn:hover{background:#f97316;color:#fff}
+.dl-btn:disabled{border-color:#d1d5db;color:#9ca3af;cursor:not-allowed}
+.chart-box{border:1px solid #e5e7eb;border-radius:10px;padding:1rem;background:#fff}
+#noResults{text-align:center;padding:2.5rem 1rem;background:#fff;border:1px solid #e5e7eb;border-radius:12px}
+#noResults .ico{font-size:2.2rem;margin-bottom:0.5rem}
+#noResults p{font-size:0.82rem;color:#9ca3af;line-height:1.5}
 
-/* ── FOOTER ── */
-footer{background:#0f1117;color:#6b7280;text-align:center;padding:1.5rem 5%;font-size:0.78rem}
-footer strong{color:#e05c1a}
-footer .flinks{display:flex;justify-content:center;gap:2rem;margin-bottom:0.75rem}
-footer .flinks a{color:#9ca3af;text-decoration:none;font-size:0.8rem}
-footer .flinks a:hover{color:#e05c1a}
+footer{background:#111827;color:#6b7280;text-align:center;padding:1.25rem 5%;font-size:0.78rem;margin-top:1.5rem}
+footer strong{color:#f97316}
 
-@media(max-width:700px){.hero{flex-direction:column}.hero-right{display:none}.pgrid,.col-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.features{gap:1.25rem}}
+@media(max-width:700px){.hero-inner,.pgrid,.col-grid,.stats-row{grid-template-columns:1fr}.hero-tags{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -150,126 +152,155 @@ footer .flinks a:hover{color:#e05c1a}
 <nav>
   <div class="nav-logo">
     <div class="dot">⚫</div>
-    <span>GRMHD<em>SED</em> Calc</span>
+    <span>GRMHD<b>SED Calc</b></span>
   </div>
   <div class="nav-status">
-    <div class="nav-dot" id="pyDot"></div>
-    <span id="pyMsg">Loading Python…</span>
+    <div class="py-dot" id="pyDot"></div>
+    <span class="py-msg" id="pyMsg">Loading Python…</span>
   </div>
-  <button class="nav-btn" onclick="document.querySelector('.content').scrollIntoView({behavior:'smooth'})">Get Started →</button>
+  <button class="nav-btn" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Get Started →</button>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-left">
-    <div class="hero-eyebrow">Astrophysics Research Tool</div>
-    <h1>Broadband <span>Spectral Energy</span><br/>Distribution from Black Hole Accretion</h1>
-    <p>Compute self-consistent synchrotron and inverse Compton spectral energy distributions directly from GRMHD simulation outputs. Upload your 3D accretion disk data, configure physical model parameters, and generate the full broadband SED — running entirely in your browser via Python.</p>
-    <div class="hero-btns">
-      <button class="btn-primary" onclick="document.querySelector('.content').scrollIntoView({behavior:'smooth'})">Get Started ↓</button>
-      <button class="btn-outline">View Documentation</button>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-label">Astrophysics Research Tool</div>
+      <h1>Broadband <span>Spectral Energy</span><br/>Distribution from Black Hole Accretion</h1>
+      <p>Compute self-consistent synchrotron and inverse Compton spectral energy distributions directly from GRMHD simulation outputs. Upload your 3D accretion disk data, configure physical model parameters, and generate the full broadband SED — running entirely in your browser via Python.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="document.querySelector('.main').scrollIntoView({behavior:'smooth'})">Get Started ↓</button>
+        <button class="btn-secondary">View Documentation</button>
+      </div>
+      <div class="hero-tags">
+        <div class="hero-tag"><div class="t">GRMHD</div><div class="s">3D SIM DATA</div></div>
+        <div class="hero-tag"><div class="t">Syn + IC</div><div class="s">FULL SED</div></div>
+        <div class="hero-tag"><div class="t">NumPy · SciPy</div><div class="s">PYTHON BACKEND</div></div>
+        <div class="hero-tag"><div class="t">In-Browser</div><div class="s">NO SERVER NEEDED</div></div>
+      </div>
     </div>
-    <div class="hero-badges">
-      <div class="hbadge"><div class="bt">GRMHD</div><div class="bl">3D SIM DATA</div></div>
-      <div class="hbadge"><div class="bt">Syn + IC</div><div class="bl">FULL SED</div></div>
-      <div class="hbadge"><div class="bt">NumPy · SciPy</div><div class="bl">PYTHON BACKEND</div></div>
-      <div class="hbadge"><div class="bt">In-Browser</div><div class="bl">NO SERVER NEEDED</div></div>
+    <div class="hero-right">
+      <div class="feature-row"><div class="feature-icon">📡</div><div><h4>Synchrotron Emission</h4><p>Self-absorbed emissivity across 3D grid</p></div></div>
+      <div class="feature-row"><div class="feature-icon">🔁</div><div><h4>Inverse Compton</h4><p>Multi-scattering IC with Wien cutoff</p></div></div>
+      <div class="feature-row"><div class="feature-icon">📊</div><div><h4>SED Output</h4><p>ν L_ν vs ν — downloadable CSV + PNG</p></div></div>
+      <div class="formula-box">
+        <p><span>ν_c</span> = (3/2) ν_s Θ_e²</p>
+        <p><span>j_ν^syn</span> ∝ nₑ νc / K₂(1/Θₑ)</p>
+        <p><span>τ</span> = nₑ σT ℓ &nbsp;&nbsp; <span>y</span> = 4 Θₑ max(τ, τ²)</p>
+        <p><span>j_ν^IC</span> = y · j_ν^syn · e^(-hν/kTₑ)</p>
+        <p><span>L_ν</span> = ∫ j_ν dV</p>
+      </div>
     </div>
-  </div>
-  <div class="hero-right">
-    <div class="eq-title">Key Equations</div>
-    <div class="eq-item">ν_c = (3/2) ν_s Θ_e²</div>
-    <div class="eq-item">j_ν^syn ∝ nₑ νc / K₂(1/Θₑ)</div>
-    <div class="eq-item">τ = nₑ σ_T ℓ</div>
-    <div class="eq-item">y = 4 Θₑ max(τ, τ²)</div>
-    <div class="eq-item">j_ν^IC = y · j_ν^syn · e^(-hν/kTₑ)</div>
-    <div class="eq-item">L_ν = ∫ j_ν dV</div>
   </div>
 </section>
 
-<!-- FEATURES -->
-<div class="features">
-  <div class="feat"><div class="feat-icon">📡</div><div><div class="feat-title">Synchrotron Emission</div><div class="feat-sub">Self-absorbed emissivity<br/>across 3D grid</div></div></div>
-  <div class="feat"><div class="feat-icon">🔁</div><div><div class="feat-title">Inverse Compton</div><div class="feat-sub">Multi-scattering IC with<br/>Wien cutoff</div></div></div>
-  <div class="feat"><div class="feat-icon">📊</div><div><div class="feat-title">SED Output</div><div class="feat-sub">ν L_ν vs ν — downloadable<br/>CSV + PNG</div></div></div>
-</div>
-
-<!-- SECTION HEADER -->
-<div class="sec-hd">
-  <div class="label">Calculator</div>
+<!-- CALCULATOR HEADER -->
+<div class="calc-header">
+  <div class="calc-label">Calculator</div>
   <h2>Upload Data &amp; Configure Model</h2>
   <p>Provide your GRMHD simulation output as a CSV file and set the physical model parameters below. The Run Code button will activate only after both are provided.</p>
 </div>
 
-<!-- MAIN CONTENT -->
-<div class="content">
+<!-- MAIN -->
+<div class="main">
 
-  <!-- CSV UPLOAD -->
+  <!-- UPLOAD -->
   <div class="card">
     <div class="card-hd">
-      <div class="ci">📂</div>
+      <div class="card-hd-icon">📂</div>
       <div><h3>Simulation Data</h3><p>Upload your GRMHD output CSV</p></div>
     </div>
-    <div class="drop-zone" id="dropZone" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
-      <input type="file" id="csvFile" accept=".csv"/>
+    <div class="drop-zone" id="dropZone"
+      ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+      <input type="file" id="csvFile" accept=".csv" onchange="handleFile(this.files[0])"/>
       <div class="drop-icon">📂</div>
       <h4>Drop CSV file here or click to browse</h4>
       <p>Accepts .csv files only</p>
     </div>
     <div class="file-badge" id="fileBadge">
-      <span>✅</span><span id="fileName">—</span>
-      <span style="margin-left:auto;cursor:pointer;color:#6b7280;font-weight:400" onclick="clearFile()">✕</span>
+      <span id="fileName">—</span>
+      <button onclick="clearFile()" title="Remove file">✕</button>
     </div>
-    <div style="margin-top:1rem">
-      <div style="font-size:0.78rem;font-weight:700;color:#374151;margin-bottom:0.6rem">Required column structure</div>
-      <div class="col-grid">
-        <div class="col-item"><div class="col-name">r</div><div class="col-desc">Radial grid points</div></div>
-        <div class="col-item"><div class="col-name">h</div><div class="col-desc">Polar (θ) grid</div></div>
-        <div class="col-item"><div class="col-name">phi</div><div class="col-desc">Azimuthal (φ) grid</div></div>
-        <div class="col-item"><div class="col-name">rho</div><div class="col-desc">Gas density ρ</div></div>
-        <div class="col-item"><div class="col-name">B</div><div class="col-desc">Magnetic field</div></div>
-        <div class="col-item"><div class="col-name">pg</div><div class="col-desc">Gas pressure</div></div>
-        <div class="col-item full opt"><div class="col-name">volume_element &nbsp;<span style="font-weight:400;font-size:0.72rem">(optional)</span></div><div class="col-desc">Auto-computed as r² sinθ Δr Δθ Δφ if absent</div></div>
-      </div>
-    </div>
-    <div class="alert ok" id="successCSV"></div>
     <div class="alert err" id="alertCSV"></div>
+    <div class="alert ok" id="successCSV"></div>
+
+    <div style="font-size:0.78rem;font-weight:700;color:#374151;margin:1rem 0 0.5rem">Required column structure</div>
+    <div class="col-grid">
+      <div class="col-item"><div class="cn">r</div><div class="cd">Radial grid points</div></div>
+      <div class="col-item"><div class="cn">h</div><div class="cd">Polar (θ) grid</div></div>
+      <div class="col-item"><div class="cn">phi</div><div class="cd">Azimuthal (φ) grid</div></div>
+      <div class="col-item"><div class="cn">rho</div><div class="cd">Gas density ρ</div></div>
+      <div class="col-item"><div class="cn">B</div><div class="cd">Magnetic field</div></div>
+      <div class="col-item"><div class="cn">pg</div><div class="cd">Gas pressure</div></div>
+      <div class="col-item opt" style="grid-column:1/-1"><div class="cn">volume_element &nbsp;<em style="font-weight:400">(optional)</em></div><div class="cd">Auto-computed as r² sinθ Δr Δθ Δφ if absent</div></div>
+    </div>
   </div>
 
-  <!-- KEY PHYSICAL PARAMS -->
+  <!-- KEY PARAMS -->
   <div class="card">
     <div class="card-hd">
-      <div class="ci">⚙️</div>
+      <div class="card-hd-icon">⚙️</div>
       <div><h3>Key Physical Parameters</h3><p>Core accretion and plasma parameters</p></div>
     </div>
     <div class="pgrid">
-      <div class="pg"><div class="pl">Ṁ (Ṁ<sub>Edd</sub>)</div><div class="pd">Mass accretion rate at horizon, in Eddington units</div><input class="pi" id="p_mdot" type="number" value="0.01" step="0.001"/></div>
-      <div class="pg"><div class="pl">M<sub>BH</sub> (M<sub>☉</sub>)</div><div class="pd">Black hole mass in solar masses</div><input class="pi" id="p_mbh" type="number" value="14" step="1"/></div>
-      <div class="pg"><div class="pl">μ<sub>i</sub></div><div class="pd">Mean molecular weight per ion. Pure H: 0.5</div><input class="pi" id="p_mui" type="number" value="0.5" step="0.1"/></div>
-      <div class="pg"><div class="pl">μ<sub>e</sub></div><div class="pd">Mean molecular weight per electron. Pure H: 0.5</div><input class="pi" id="p_mue" type="number" value="0.5" step="0.1"/></div>
-      <div class="pg full"><div class="pl">R (T<sub>p</sub>/T<sub>e</sub>)</div><div class="pd">Proton-to-electron temperature ratio</div><input class="pi" id="p_R" type="number" value="300" step="10"/></div>
+      <div class="pg">
+        <label>Ṁ (Ṁ<sub>Edd</sub>)</label>
+        <div class="desc">Mass accretion rate at horizon, in Eddington units</div>
+        <input id="p_mdot" type="number" value="0.01" step="0.001"/>
+      </div>
+      <div class="pg">
+        <label>M<sub>BH</sub> (M<sub>☉</sub>)</label>
+        <div class="desc">Black hole mass in solar masses</div>
+        <input id="p_mbh" type="number" value="14" step="1"/>
+      </div>
+      <div class="pg">
+        <label>μ<sub>i</sub></label>
+        <div class="desc">Mean molecular weight per ion. Pure H: 0.5</div>
+        <input id="p_mui" type="number" value="0.5" step="0.1"/>
+      </div>
+      <div class="pg">
+        <label>μ<sub>e</sub></label>
+        <div class="desc">Mean molecular weight per electron. Pure H: 0.5</div>
+        <input id="p_mue" type="number" value="0.5" step="0.1"/>
+      </div>
+    </div>
+    <div class="pgrid one" style="margin-top:0.9rem">
+      <div class="pg">
+        <label>R (T<sub>p</sub>/T<sub>e</sub>)</label>
+        <div class="desc">Proton-to-electron temperature ratio</div>
+        <input id="p_R" type="number" value="300" step="10"/>
+      </div>
     </div>
   </div>
 
   <!-- SPECTRAL PARAMS -->
   <div class="card">
     <div class="card-hd">
-      <div class="ci">📐</div>
+      <div class="card-hd-icon" style="background:#ede9fe">📐</div>
       <div><h3>Spectral &amp; Radiative Transfer Parameters</h3><p>Frequency grid and Comptonization settings</p></div>
     </div>
+
+    <div class="param-section-label">Frequency Grid</div>
     <div class="pgrid">
-      <div class="params-section-title">Frequency Grid</div>
-      <div class="pg"><div class="pl">N<sub>freq</sub></div><div class="pd">Number of log-spaced frequency grid points</div><input class="pi" id="p_Nfreq" type="number" value="100" step="10" min="10" max="500"/></div>
-      <div class="pg"><div class="pl">ν<sub>min</sub> (Hz)</div><div class="pd">Lower bound of spectral frequency grid</div><input class="pi" id="p_numin" type="number" value="1e9"/></div>
-      <div class="pg full"><div class="pl">ν<sub>max</sub> (Hz)</div><div class="pd">Upper bound of spectral frequency grid</div><input class="pi" id="p_numax" type="number" value="1e22"/></div>
-      <div class="params-section-title">Comptonization</div>
-      <div class="pg"><div class="pl">τ<sub>max</sub></div><div class="pd">Max optical depth before spectrum thermalizes</div><input class="pi" id="p_taumax" type="number" value="10" step="1"/></div>
-      <div class="pg"><div class="pl">f<sub>cutoff</sub></div><div class="pd">Wien cutoff factor for IC high-energy suppression</div><input class="pi" id="p_fcutoff" type="number" value="2" step="0.5"/></div>
-      <div class="pg"><div class="pl">N<sub>scatt,thin</sub></div><div class="pd">Max IC scatterings in optically thin regions (τ &lt; 1)</div><input class="pi" id="p_Nthin" type="number" value="1" step="1"/></div>
-      <div class="pg"><div class="pl">N<sub>scatt,thick</sub></div><div class="pd">Max IC scatterings in optically thick regions (τ ≥ 1)</div><input class="pi" id="p_Nthick" type="number" value="5" step="1"/></div>
-      <div class="params-section-title">Volume Element</div>
-      <div class="pg full"><div class="pl">Source</div><div class="pd">Use CSV column if present, otherwise auto-compute r² sinθ Δr Δθ Δφ</div>
-        <select class="pi" id="p_vol_mode"><option value="csv">Use volume_element column from CSV</option><option value="auto">Auto-compute from grid</option></select>
+      <div class="pg"><label>N<sub>freq</sub></label><div class="desc">Number of log-spaced frequency grid points</div><input id="p_Nfreq" type="number" value="100" step="10" min="10" max="500"/></div>
+      <div class="pg"><label>ν<sub>min</sub> (Hz)</label><div class="desc">Lower bound of spectral frequency grid</div><input id="p_numin" type="number" value="1e9"/></div>
+      <div class="pg"><label>ν<sub>max</sub> (Hz)</label><div class="desc">Upper bound of spectral frequency grid</div><input id="p_numax" type="number" value="1e22"/></div>
+    </div>
+
+    <div class="param-section-label">Comptonization</div>
+    <div class="pgrid">
+      <div class="pg"><label>τ<sub>max</sub></label><div class="desc">Max optical depth before spectrum thermalizes</div><input id="p_taumax" type="number" value="10" step="1"/></div>
+      <div class="pg"><label>f<sub>cutoff</sub></label><div class="desc">Wien cutoff factor for IC high-energy suppression</div><input id="p_fcutoff" type="number" value="2" step="0.5"/></div>
+      <div class="pg"><label>N<sub>scatt,thin</sub></label><div class="desc">Max IC scatterings in optically thin regions (τ &lt; 1)</div><input id="p_Nthin" type="number" value="1" step="1"/></div>
+      <div class="pg"><label>N<sub>scatt,thick</sub></label><div class="desc">Max IC scatterings in optically thick regions (τ ≥ 1)</div><input id="p_Nthick" type="number" value="5" step="1"/></div>
+    </div>
+
+    <div class="param-section-label">Volume Element</div>
+    <div class="pgrid one">
+      <div class="pg">
+        <label>Source</label>
+        <div class="desc">Use CSV column if present, otherwise auto-compute r² sinθ Δr Δθ Δφ</div>
+        <select id="p_vol_mode"><option value="csv">Use volume_element column from CSV</option><option value="auto">Auto-compute from grid</option></select>
       </div>
     </div>
   </div>
@@ -278,49 +309,49 @@ footer .flinks a:hover{color:#e05c1a}
   <div class="ready-box">
     <h3>Ready to Compute?</h3>
     <p>Upload your simulation CSV and ensure all parameters are set, then click Run Code to start the calculation.</p>
-    <div id="runHint"></div>
-    <div class="steps" id="progSteps" style="display:none">
-      <div class="sd" id="d1"><div class="circle">1</div><span>Parse</span></div>
-      <div class="sd" id="d2"><div class="circle">2</div><span>Synchrotron</span></div>
-      <div class="sd" id="d3"><div class="circle">3</div><span>IC</span></div>
-      <div class="sd" id="d4"><div class="circle">4</div><span>Done</span></div>
-    </div>
-    <button class="run-btn-big" id="runBtn" disabled onclick="runCalculation()">▶ Run Code</button>
-    <div class="alert err" id="alertRun" style="margin-top:0.75rem;text-align:left"></div>
+    <button class="btn-run" id="runBtn" disabled onclick="runCalculation()">▶ Run Code</button>
+    <div id="runHint">Waiting for Python environment to load…</div>
   </div>
+
+  <!-- PROGRESS -->
+  <div class="prog-box" id="progressBox">
+    <div class="steps"><div class="sd" id="d1"></div><div class="sd" id="d2"></div><div class="sd" id="d3"></div><div class="sd" id="d4"></div></div>
+    <div class="prog-lbl" id="progLbl">Starting…</div>
+  </div>
+  <div id="statusBox"></div>
 
   <!-- RESULTS -->
-  <div id="resultsSection">
-    <div class="res-card">
-      <div class="stats-row">
-        <div class="stat"><div class="sv" id="s_peak_syn">—</div><div class="sl">Peak νL<sub>ν</sub> Synchrotron</div></div>
-        <div class="stat"><div class="sv" id="s_peak_ic">—</div><div class="sl">Peak νL<sub>ν</sub> IC</div></div>
-        <div class="stat"><div class="sv" id="s_peak_tot">—</div><div class="sl">Peak νL<sub>ν</sub> Total</div></div>
-      </div>
-      <div class="res-hd">
-        <span style="font-size:0.9rem;font-weight:700">Results</span>
-        <div class="dl-btns">
-          <button class="dl-btn" id="btnDlCSV">⬇ Download CSV</button>
-          <button class="dl-btn" id="btnDlPNG">⬇ Download PNG</button>
-        </div>
-      </div>
-      <div class="chart-box"><canvas id="specChart"></canvas></div>
+  <div id="resultsPanel">
+    <div class="stats-row">
+      <div class="stat-card"><div class="sv" id="s_peak_syn">—</div><div class="sl">Peak ν L<sub>ν</sub> Synchrotron</div></div>
+      <div class="stat-card"><div class="sv" id="s_peak_ic">—</div><div class="sl">Peak ν L<sub>ν</sub> IC</div></div>
+      <div class="stat-card"><div class="sv" id="s_peak_tot">—</div><div class="sl">Peak ν L<sub>ν</sub> Total</div></div>
     </div>
+    <div class="res-hd">
+      <h3>Results</h3>
+      <div class="dl-btns">
+        <button class="dl-btn" id="btnDlCSV" disabled onclick="downloadCSV()">⬇ Download CSV</button>
+        <button class="dl-btn" id="btnDlPNG" disabled onclick="downloadPNG()">⬇ Download PNG</button>
+      </div>
+    </div>
+    <div class="chart-box"><canvas id="specChart"></canvas></div>
   </div>
 
-</div><!-- /content -->
+  <div id="noResults">
+    <div class="ico">📊</div>
+    <p>Upload your simulation CSV, configure the model parameters,<br/>and click <strong>Run Code</strong> to generate the spectrum.</p>
+  </div>
+
+</div><!-- /main -->
 
 <footer>
-  <div class="flinks">
-    <a href="#">Home</a><a href="#">Documentation</a><a href="#">About</a><a href="#">Contact</a>
-  </div>
-  <strong>IISc Bangalore</strong> · Astrophysics Research · Powered by Pyodide + NumPy + SciPy
+  <strong>GRMHD SED Calc</strong> &nbsp;·&nbsp; IISc Bangalore &nbsp;·&nbsp; Astrophysics Research &nbsp;·&nbsp; Powered by Pyodide + NumPy + SciPy
 </footer>
 
 <script>
 var pyodide=null, csvRaw=null, specResults=null, specChart=null, pyReady=false;
 
-// ── Load Pyodide ──
+// ── Load Pyodide ──────────────────────────────────────────────────────────────
 loadPyodide().then(function(py){
   pyodide=py; return pyodide.loadPackage(['numpy','scipy']);
 }).then(function(){
@@ -332,9 +363,8 @@ loadPyodide().then(function(py){
 });
 
 function setStatus(state,msg){
-  var d=document.getElementById('pyDot'), m=document.getElementById('pyMsg');
-  d.className='nav-dot'+(state==='ready'?' ready':state==='running'?' running':'');
-  m.textContent=msg;
+  document.getElementById('pyDot').className='py-dot '+state;
+  document.getElementById('pyMsg').textContent=msg;
 }
 
 function checkRunReady(){
@@ -346,23 +376,21 @@ function checkRunReady(){
     'All inputs ready — click Run Code to start the computation.';
 }
 
-// ── Drag / drop / file ──
+// ── File handling ─────────────────────────────────────────────────────────────
 function onDrag(e,s){e.preventDefault();document.getElementById('dropZone').classList.toggle('drag',s);}
 function onDrop(e){e.preventDefault();onDrag(e,false);handleFile(e.dataTransfer.files[0]);}
-
-document.getElementById('csvFile').onchange=function(){
-  if(this.files[0]) handleFile(this.files[0]);
-};
 
 function handleFile(file){
   if(!file)return;
   hideAlerts();
   var reader=new FileReader();
-  reader.onload=function(e){
-    csvRaw=e.target.result;
+  reader.onload=function(ev){
+    csvRaw=ev.target.result;
     document.getElementById('fileName').textContent=file.name;
     document.getElementById('fileBadge').style.display='flex';
-    showAlert('successCSV','"'+file.name+'" loaded successfully','ok');
+    var el=document.getElementById('successCSV');
+    el.textContent='"'+file.name+'" loaded successfully';
+    el.style.display='block';
     checkRunReady();
   };
   reader.readAsText(file);
@@ -375,47 +403,33 @@ function clearFile(){
   hideAlerts(); checkRunReady();
 }
 
-function showAlert(id,msg,cls){
-  var el=document.getElementById(id);
-  el.textContent=msg; el.className='alert '+(cls||'err'); el.style.display='block';
-}
-function hideAlerts(){
-  ['alertCSV','successCSV','alertRun'].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.style.display='none';
-  });
-}
+function gv(id){return document.getElementById(id).value;}
 
-function setStep(n){
-  ['d1','d2','d3','d4'].forEach(function(d,i){
-    var el=document.getElementById(d);
-    el.className='sd'+(i<n?' done':i===n?' active':'');
-  });
-}
-
-function gv(id){return parseFloat(document.getElementById(id).value);}
-
-// ── Run ──
+// ── Run calculation ───────────────────────────────────────────────────────────
 function runCalculation(){
   if(!pyodide||!csvRaw)return;
   hideAlerts();
   var btn=document.getElementById('runBtn');
   btn.textContent='⏳ Computing…'; btn.disabled=true;
   setStatus('running','Running calculation…');
-  document.getElementById('progSteps').style.display='flex';
-  setStep(0);
+  var pb=document.getElementById('progressBox');
+  pb.style.display='block'; setStep(1);
 
   pyodide.globals.set('csv_content', csvRaw);
-  pyodide.globals.set('_mu_i',   gv('p_mui'));
-  pyodide.globals.set('_mu_e',   gv('p_mue'));
-  pyodide.globals.set('_R',      gv('p_R'));
-  pyodide.globals.set('_Nfreq',  parseInt(document.getElementById('p_Nfreq').value));
-  pyodide.globals.set('_numin',  gv('p_numin'));
-  pyodide.globals.set('_numax',  gv('p_numax'));
-  pyodide.globals.set('_taumax', gv('p_taumax'));
-  pyodide.globals.set('_fc',     gv('p_fcutoff'));
-  pyodide.globals.set('_Nthin',  parseFloat(document.getElementById('p_Nthin').value));
-  pyodide.globals.set('_Nthick', parseFloat(document.getElementById('p_Nthick').value));
-  pyodide.globals.set('_volmode', document.getElementById('p_vol_mode').value);
+  pyodide.globals.set('_mu_i',   parseFloat(gv('p_mui')));
+  pyodide.globals.set('_mu_e',   parseFloat(gv('p_mue')));
+  pyodide.globals.set('_R',      parseFloat(gv('p_R')));
+  pyodide.globals.set('_Nfreq',  parseInt(gv('p_Nfreq')));
+  pyodide.globals.set('_numin',  parseFloat(gv('p_numin')));
+  pyodide.globals.set('_numax',  parseFloat(gv('p_numax')));
+  pyodide.globals.set('_taumax', parseFloat(gv('p_taumax')));
+  pyodide.globals.set('_fc',     parseFloat(gv('p_fcutoff')));
+  pyodide.globals.set('_Nthin',  parseFloat(gv('p_Nthin')));
+  pyodide.globals.set('_Nthick', parseFloat(gv('p_Nthick')));
+  pyodide.globals.set('_volmode',gv('p_vol_mode'));
+
+  setTimeout(function(){setStep(2);},300);
+  setTimeout(function(){setStep(3);},600);
 
   var pyCode=[
 "import numpy as np, json",
@@ -460,7 +474,8 @@ function runCalculation(){
 "N_scat=tau_effective",
 "N_max=np.where(tau<1,_Nthin,_Nthick)",
 "N_scat_cap=np.minimum(N_scat,N_max)",
-"K2=np.maximum(kn(2,1.0/np.maximum(Theta_e,1e-10)),1e-300)",
+"K2=kn(2,1.0/np.maximum(Theta_e,1e-10))",
+"K2=np.maximum(K2,1e-300)",
 "nu_array=np.logspace(np.log10(_numin),np.log10(_numax),_Nfreq)",
 "log_nu=np.log10(nu_array)",
 "N_flat=r_res*th_res*phi_res",
@@ -497,18 +512,48 @@ function runCalculation(){
 "json.dumps({'nu':nu_array.tolist(),'L_syn':L_syn.tolist(),'L_IC':L_IC.tolist(),'L_tot':L_tot.tolist()})"
   ].join('\n');
 
-  setStep(1);
   pyodide.runPythonAsync(pyCode).then(function(res){
-    setStep(4);
     specResults=JSON.parse(res);
+    var nf=parseInt(gv('p_Nfreq'));
+    setStep(4);
     renderResults(specResults);
-    setStatus('ready','Done — '+document.getElementById('p_Nfreq').value+' spectral points');
+    showSt('Calculation complete! '+nf+' spectral points computed.','success');
+    setStatus('ready','Done — '+nf+' spectral points');
+    document.getElementById('btnDlCSV').disabled=false;
+    document.getElementById('btnDlPNG').disabled=false;
+    pb.style.display='none';
     btn.textContent='▶ Run Code'; btn.disabled=false;
+    checkRunReady();
   }).catch(function(err){
-    showAlert('alertRun','❌ '+(err.message||String(err)),'err');
-    setStatus('ready','Calculation failed');
+    var msg=err&&err.message?err.message:String(err);
+    showErr(msg);
+    setStatus('error','Calculation failed');
+    pb.style.display='none';
     btn.textContent='▶ Run Code'; btn.disabled=false;
+    checkRunReady();
     console.error(err);
+  });
+}
+
+function setStep(n){
+  ['d1','d2','d3','d4'].forEach(function(d,i){
+    document.getElementById(d).className='sd'+(i<n?' done':'');
+  });
+  var labels=['','Parsing CSV & building grid…','Computing synchrotron emission…','Computing inverse Compton…','Complete!'];
+  document.getElementById('progLbl').textContent=labels[n]||'';
+}
+
+function showSt(msg,cls){
+  var el=document.getElementById('statusBox');
+  el.textContent=msg; el.className=cls; el.style.display='block';
+}
+function showErr(msg){
+  var el=document.getElementById('alertCSV');
+  el.textContent='❌ '+msg; el.style.display='block';
+}
+function hideAlerts(){
+  ['alertCSV','successCSV','statusBox'].forEach(function(id){
+    var el=document.getElementById(id); if(el)el.style.display='none';
   });
 }
 
@@ -519,31 +564,30 @@ function fmtE(v){
 }
 
 function renderResults(d){
-  document.getElementById('resultsSection').style.display='block';
+  document.getElementById('noResults').style.display='none';
+  document.getElementById('resultsPanel').style.display='block';
   var nLs=d.nu.map(function(n,i){return n*d.L_syn[i];});
   var nLi=d.nu.map(function(n,i){return n*d.L_IC[i];});
   var nLt=d.nu.map(function(n,i){return n*d.L_tot[i];});
   document.getElementById('s_peak_syn').textContent=fmtE(Math.max.apply(null,nLs));
   document.getElementById('s_peak_ic').textContent=fmtE(Math.max.apply(null,nLi));
   document.getElementById('s_peak_tot').textContent=fmtE(Math.max.apply(null,nLt));
-  if(specChart) specChart.destroy();
+  if(specChart)specChart.destroy();
   specChart=new Chart(document.getElementById('specChart').getContext('2d'),{
     type:'line',
     data:{labels:d.nu,datasets:[
-      {label:'Synchrotron',data:nLs,borderColor:'#e05c1a',backgroundColor:'rgba(224,92,26,0.05)',borderWidth:2,pointRadius:0,tension:0.3},
-      {label:'Inverse Compton',data:nLi,borderColor:'#3b6dd4',backgroundColor:'rgba(59,109,212,0.05)',borderWidth:2,pointRadius:0,tension:0.3},
-      {label:'Total',data:nLt,borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,0.04)',borderWidth:2,pointRadius:0,tension:0.3,borderDash:[5,3]}
+      {label:'Synchrotron',data:nLs,borderColor:'#f97316',backgroundColor:'rgba(249,115,22,0.05)',borderWidth:2,pointRadius:0,tension:0.3},
+      {label:'Inverse Compton',data:nLi,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.05)',borderWidth:2,pointRadius:0,tension:0.3},
+      {label:'Total',data:nLt,borderColor:'#111827',backgroundColor:'rgba(17,24,39,0.04)',borderWidth:2,pointRadius:0,tension:0.3,borderDash:[5,3]}
     ]},
     options:{responsive:true,
       scales:{
         x:{type:'logarithmic',title:{display:true,text:'ν (Hz)',font:{size:12}},ticks:{callback:function(v){return '10^'+Math.round(Math.log10(v));}}},
         y:{type:'logarithmic',title:{display:true,text:'νLν (erg s⁻¹)',font:{size:12}},ticks:{callback:function(v){return '10^'+Math.round(Math.log10(v));}}}
       },
-      plugins:{legend:{position:'top'},tooltip:{mode:'index',intersect:false}}
+      plugins:{legend:{position:'top'}}
     }
   });
-  document.getElementById('btnDlCSV').onclick=function(){downloadCSV();};
-  document.getElementById('btnDlPNG').onclick=function(){downloadPNG();};
 }
 
 function downloadCSV(){
@@ -553,13 +597,13 @@ function downloadCSV(){
     c+=specResults.nu[i]+','+specResults.L_syn[i]+','+specResults.L_IC[i]+','+specResults.L_tot[i]+'\n';
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));
-  a.download='spectrum_output.csv'; a.click();
+  a.download='SED_results.csv'; a.click();
 }
 function downloadPNG(){
   if(!specChart)return;
   var a=document.createElement('a');
   a.href=document.getElementById('specChart').toDataURL('image/png');
-  a.download='spectrum_plot.png'; a.click();
+  a.download='SED_plot.png'; a.click();
 }
 </script>
 </body>
